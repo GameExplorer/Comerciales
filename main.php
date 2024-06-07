@@ -65,31 +65,6 @@ GROUP BY CodigoRuta, CodigoCliente, RazonSocial
 ORDER BY RUTA, CodigoCliente
 ";
 
-
-$sql_ruta = " SELECT 
-		'Albaran' AS TIPO,
-		AVC.CodigoRuta AS RUTA,
-		AVC.CodigoComisionista AS COMISIONISTA,
-		IIF(AVC.CodigoComisionista IN (51,3,25),COMI.Comisionista,'') AS NOMBRE,
-		CONVERT(VARCHAR,AVC.FechaAlbaran,101) AS FECHA,
-		AVC.CodigoCliente,
-		AVC.RazonSocial,
-		AVC.NumeroFactura,
-		CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
-		CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
-		CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
-
-FROM AlbaranVentaCabecera AS AVC
-LEFT JOIN Comisionistas AS COMI
-	ON	COMI.CodigoComisionista = AVC.CodigoComisionista
-WHERE		AVC.CodigoEmpresa = 1
-		AND AVC.EjercicioAlbaran = @EJERCICIO
-		AND MONTH(AVC.FechaAlbaran) = @MES
-		AND AVC.CodigoRuta IN (91,92,93)
-GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
-ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
-";
-
 // Préparation et exécution de la requête
 $stmt_cliente = sqlsrv_query($conn, $sql_cliente, $params);
 if ($stmt_cliente === false) {
@@ -104,6 +79,37 @@ while ($row = sqlsrv_fetch_array($stmt_cliente, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_cliente);
 sqlsrv_close($conn);
+
+// Check if download is requested
+if (isset($_GET['download']) && $_GET['download'] === 'ruta') {
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment;filename="ventas_ruta.csv"');
+
+    $output = fopen('php://output', 'w');
+    fputcsv($output, array('RUTA', 'COMERCIAL', 'FACTURADO'));
+
+    foreach ($results_ruta as $row) {
+        fputcsv($output, $row);
+    }
+
+    fclose($output);
+    exit;
+}
+
+if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment;filename="ventas_cliente.csv"');
+
+    $output = fopen('php://output', 'w');
+    fputcsv($output, array('RUTA', 'COMERCIAL', 'CLIENTE', 'RAZON SOCIAL', 'FACTURADO'));
+
+    foreach ($results_cliente as $row) {
+        fputcsv($output, $row);
+    }
+
+    fclose($output);
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -150,8 +156,8 @@ sqlsrv_close($conn);
             top: -7px;
             left: -5px;
             cursor: pointer;
-            opacity: 0; 
-            z-index: 2; 
+            opacity: 0; /* hide this */
+            z-index: 2; /* and place it over the hamburger */
             -webkit-touch-callout: none;
         }
 
@@ -286,6 +292,7 @@ sqlsrv_close($conn);
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta" class="btn btn-secondary">Download Ruta CSV</a>
                 </div>
 
                 <!-- Tab content for Cliente -->
@@ -312,6 +319,7 @@ sqlsrv_close($conn);
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente" class="btn btn-secondary">Download Cliente CSV</a>
                 </div>
             </main>
         </div>

@@ -259,18 +259,32 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <h2>Rapport des Ventes</h2>
                 <form method="get" action="" class="row g-3">
-                    <div class="col-auto">
-                        <label for="mes" class="form-label">MES :</label>
-                        <input type="number" class="form-control" id="mes" name="mes" min="1" max="12" value="<?php echo $MES; ?>" size="2">
-                    </div>
-                    <div class="col-auto">
-                        <label for="annee" class="form-label">AÑO :</label>
-                        <input type="number" class="form-control" id="annee" name="annee" min="2000" max="<?php echo date('Y'); ?>" value="<?php echo $ANNEE; ?>" size="4">
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Filtrer</button>
-                    </div>
-                </form>
+            <div class="col-auto">
+                <label for="mes" class="form-label">Mois :</label>
+                <select class="form-select" id="mes" name="mes">
+                    <?php
+                    for ($i = 1; $i <= 12; $i++) {
+                        $selected = ($i == $MES) ? 'selected' : '';
+                        echo "<option value=\"$i\" $selected>$i</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="annee" class="form-label">Année :</label>
+                <select class="form-select" id="annee" name="annee">
+                    <?php
+                    for ($i = date('Y')-4; $i <= date('Y'); $i++) {
+                        $selected = ($i == $ANNEE) ? 'selected' : '';
+                        echo "<option value=\"$i\" $selected>$i</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Filtrer</button>
+            </div>
+        </form>
 
                 <!-- Tab content for Ruta -->
                 <div id="Ruta" class="tabcontent">

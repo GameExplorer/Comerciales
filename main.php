@@ -28,13 +28,14 @@ LEFT JOIN Comisionistas AS COMI ON COMI.CodigoComisionista = AVC.CodigoComisioni
 WHERE AVC.CodigoEmpresa = 1
     AND AVC.EjercicioAlbaran = ?
     AND MONTH(AVC.FechaAlbaran) = ?
+    AND YEAR(AVC.FechaAlbaran) = ?
     AND AVC.CodigoRuta IN (91,92,93)
 GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
 ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
 ";
 
 // Préparation et exécution de la requête
-$params_ruta = array($ANNEE, $MES);
+$params_ruta = array($ANNEE, $MES, $ANNEE);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -47,6 +48,7 @@ while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
 }
 
 sqlsrv_free_stmt($stmt_ruta);
+
 
 // Requête SQL pour les ventes par client
 $sql_cliente = "
@@ -85,6 +87,7 @@ while ($row = sqlsrv_fetch_array($stmt_cliente, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_cliente);
 
+
 // Requête SQL pour les informations globales
 $sql_all = "
 SELECT 
@@ -99,12 +102,13 @@ FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
     AND EjercicioAlbaran = ?
     AND MONTH(FechaAlbaran) = ?
+    AND YEAR(FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta
 ";
 
 // Préparation et exécution de la requête
-$params_all = array($ANNEE, $MES);
+$params_all = array($ANNEE, $MES, $ANNEE);
 $stmt_all = sqlsrv_query($conn, $sql_all, $params_all);
 if ($stmt_all === false) {
     die(print_r(sqlsrv_errors(), true));

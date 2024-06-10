@@ -9,23 +9,6 @@ if ($conn === false) {
 $MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
 
-// Sanitize and validate input
-$MES = filter_var($MES, FILTER_VALIDATE_INT, [
-    'options' => [
-        'default' => date('m'),
-        'min_range' => 1,
-        'max_range' => 12,
-    ]
-]);
-
-$ANNEE = filter_var($ANNEE, FILTER_VALIDATE_INT, [
-    'options' => [
-        'default' => date('Y'),
-        'min_range' => 2000,
-        'max_range' => 2100,
-    ]
-]);
-
 // SQL query for sales by ruta
 $sql_ruta = "
 SELECT 
@@ -83,13 +66,14 @@ FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
     AND EjercicioAlbaran = ?
     AND MONTH(FechaAlbaran) = ?
+    AND YEAR(FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta, CodigoCliente, RazonSocial
 ORDER BY RUTA, CodigoCliente
 ";
 
 // Prepare and execute the query
-$params_cliente = array($ANNEE, $MES);
+$params_cliente = array($ANNEE, $MES, $ANNEE);
 $stmt_cliente = sqlsrv_query($conn, $sql_cliente, $params_cliente);
 
 if ($stmt_cliente === false) {
@@ -187,164 +171,203 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
     exit;
 }
 ?>
-    
-    
-    <!DOCTYPE ht    ml>
-<html lang="fr">    
+
+
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-        <meta ch    arset="UTF-8">
-    <meta na    me="viewport" content="width=device-width, initial-scale=1.0">
-    <tit    le>Rapport des Ventes</tit>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="style.css">
-
-        <script>
-            function openTab(evt, tabName) {
-                var i, tabcontent, tablinks;
-                tabcontent = document.getElementsByClassName("tabcontent");
-                for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
-                }
-                tablinks = document.getElementsByClassName("tablinks");
-            for     (i = 0; i < tablinks.length; i++) {
-
-                        
-                                        tablinks[i].className = tablinks[i].className.re
-                        place(" active",
-                     "");
-                }
-
-                        
-                                    document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.className += " active";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport des Ventes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
             }
-        </script>
-    </head>
-    <body>
-        <nav role="navigation">
-            <div id="menuToggle">
-                <input type="checkbox" />
-                <span></span>
-                <span></span>
-                <span></span>
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+</head>
+<body>
+    <nav role="navigation">
+        <div id="menuToggle">
+            <input type="checkbox" />
+            <span></span>
+            <span></span>
+            <span></span>
             <ul id="menu">
                 <a href="#" onclick="openTab(event, 'Seller')"><li>Todo</li></a>
                 <a href="#" onclick="openTab(event, 'Cliente')"><li>Cliente</li></a>
                 <a href="#" onclick="openTab(event, 'Ruta')"><li>Ruta</li></a>
-                <a href="parametres.php"><li>Paramètres</li></a>
             </ul>
         </div>
     </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <h2>Rapport des Ventes</h2>
+                <form method="get" action="" class="row g-3">
+                    <div class="col-auto">
+                        <label for="mes" class="form-label">Mois :</label>
+                        <select class="form-select" id="mes" name="mes">
+                            <?php
+                                $monthNames = [
+                                    1 => 'Janvier',
+                                    2 => 'Février',
+                                    3 => 'Mars',
+                                    4 => 'Avril',
+                                    5 => 'Mai',
+                                    6 => 'Juin',
+                                    7 => 'Juillet',
+                                    8 => 'Août',
+                                    9 => 'Septembre',
+                                    10 => 'Octobre',
+                                    11 => 'Novembre',
+                                    12 => 'Décembre'
+                                ];
+                                foreach ($monthNames as $key => $value) {
+                                    $selected = ($key == $MES) ? 'selected' : '';
+                                    echo "<option value=\"$key\" $selected>$value</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="annee" class="form-label">Année :</label>
+                            <select class="form-select" id="annee" name="annee">
+                                <?php
+                                $current_year = date('Y');
+                                for ($i = $current_year - 5; $i <= $current_year; $i++) {
+                                    $selected = ($i == $ANNEE) ? 'selected' : '';
+                                    echo "<option value=\"$i\" $selected>$i</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">Filtrer</button>
+                        </div>
+                    </form>
 
-    <div id="Seller" class="tabcontent">
-        <h3>Ventes par Ruta</h3>
-        <form method="get" action="">
-            <label for="mes">Mois:</label>
-            <input type="number" name="mes" id="mes" min="1" max="12" value="<?php echo htmlspecialchars($MES); ?>">
-            <label for="annee">Année:</label>
-            <input type="number" name="annee" id="annee" min="2000" max="2100" value="<?php echo htmlspecialchars($ANNEE); ?>">
-            <button type="submit">Filtrer</button>
-        </form>
-        <a href="?download=ruta&mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>">Télécharger CSV</a>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>TIPO</th>
-                    <th>RUTA</th>
-                    <th>COMISIONISTA</th>
-                    <th>NOMBRE</th>
-                    <th>FECHA</th>
-                    <th>CodigoCliente</th>
-                    <th>RazonSocial</th>
-                    <th>NumeroFactura</th>
-                    <th>BRUTO</th>
-                    <th>DTO</th>
-                    <th>FACTURADO</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($results_ruta as $row): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
-                            <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                            <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                            <td><?php echo htmlspecialchars($row['NumeroFactura']); ?></td>
-                            <td><?php echo htmlspecialchars($row['BRUTO']); ?></td>
-                            <td><?php echo htmlspecialchars($row['DTO']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                        </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+                    <!-- Tab content for Ruta -->
+                    <div id="Ruta" class="tabcontent">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>TIPO</th>
+                                    <th>RUTA</th>
+                                    <th>COMISIONISTA</th>
+                                    <th>NOMBRE</th>
+                                    <th>FECHA</th>
+                                    <th>CodigoCliente</th>
+                                    <th>RazonSocial</th>
+                                    <th>NumeroFactura</th>
+                                    <th>BRUTO</th>
+                                    <th>DTO</th>
+                                    <th>FACTURADO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($results_ruta as $row): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['NumeroFactura']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['BRUTO']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['DTO']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-9"></div>
+                            <div class="col-md-4 pt-2">
+                                <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta"
+                                    class="btn btn-success">Descargar como CSV</a>
+                            </div>
+                        </div>
+                    </div>
 
-    <div id="Cliente" class="tabcontent" style="display:none">
-        <h3>Ventes par Cliente</h3>
-        <form method="get" action="">
-        <label for="mes">Mois:</label>
-        <input type="number" name="mes" id="mes" min="1" max="12" value="<?php echo htmlspecialchars($MES); ?>">
-        <label for="annee">Année:</label>
-        <input type="number" name="annee" id="annee" min="2000" max="2100" value="<?php echo htmlspecialchars($ANNEE); ?>">
-        <button type="submit">Filtrer</button>
-    </form>
-    <a href="?download=cliente&mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>">Télécharger CSV</a>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>RUTA</th>
-                <th>COMERCIAL</th>
-                <th>CLIENTE</th>
-                    <th>RAZON SOCIAL</th>
-                    <th>FACTURADO</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($results_cliente as $row): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                            <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                            <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                        </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+                    <!-- Tab content for Cliente -->
+                    <div id="Cliente" class="tabcontent">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>RUTA</th>
+                                    <th>COMERCIAL</th>
+                                    <th>CLIENTE</th>
+                                    <th>RAZON SOCIAL</th>
+                                    <th>FACTURADO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($results_cliente as $row): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-9"></div>
+                            <div class="col-md-4 pt-2">
+                                <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente"
+                                    class="btn btn-success">Descargar como CSV</a>
+                            </div>
+                        </div>
+                    </div>
 
-    <div id="Ruta" class="tabcontent" style="display:none">
-        <h3>Informations Globales</h3>
-        <form method="get" action="">
-            <label for="mes">Mois:</label>
-            <input type="number" name="mes" id="mes" min="1" max="12" value="<?php echo htmlspecialchars($MES); ?>">
-            <label for="annee">Année:</label>
-            <input type="number" name="annee" id="annee" min="2000" max="2100" value="<?php echo htmlspecialchars($ANNEE); ?>">
-            <button type="submit">Filtrer</button>
-    </form>
-    <a href="?download=all&mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>">Télécharger CSV</a>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>RUTA</th>
-                <th>COMERCIAL</th>
-                    <th>FACTURADO</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($results_all as $row): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                        </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+                    <!-- Tab content for Seller -->
+                    <div id="Seller" class="tabcontent">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>RUTA</th>
+                                    <th>COMERCIAL</th>
+                                    <th>FACTURADO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($results_all as $row): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-9"></div>
+                            <div class="col-md-4 pt-2">
+                                <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=all"
+                                    class="btn btn-success">Descargar como CSV</a>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 
-</body>
 </html>

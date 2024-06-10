@@ -36,7 +36,9 @@ ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
 // Prepare and execute the query
 $params_ruta = array($ANNEE, $MES);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
+
 if ($stmt_ruta === false) {
+    echo "Error in query execution: ";
     die(print_r(sqlsrv_errors(), true));
 }
 
@@ -73,7 +75,9 @@ ORDER BY RUTA, CodigoCliente
 // Prepare and execute the query
 $params_cliente = array($ANNEE, $MES, $ANNEE);
 $stmt_cliente = sqlsrv_query($conn, $sql_cliente, $params_cliente);
+
 if ($stmt_cliente === false) {
+    echo "Error in query execution: ";
     die(print_r(sqlsrv_errors(), true));
 }
 
@@ -106,7 +110,9 @@ GROUP BY CodigoRuta
 // Prepare and execute the query
 $params_all = array($ANNEE, $MES);
 $stmt_all = sqlsrv_query($conn, $sql_all, $params_all);
+
 if ($stmt_all === false) {
+    echo "Error in query execution: ";
     die(print_r(sqlsrv_errors(), true));
 }
 
@@ -166,61 +172,54 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="fr">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Rapport des Ventes</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="style.css">
-        <script>
-            function openTab(evt, tabName) {
-                var i, tabcontent, tablinks;
-                tabcontent = document.getElementsByClassName("tabcontent");
-                for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
-                }
-                tablinks = document.getElementsByClassName("tablinks");
-                for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].className = tablinks[i].className.replace(" active", "");
-                }
-                document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.className += " active";
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport des Ventes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
             }
-        </script>
-    </head>
-
-    <body>
-        <nav role="navigation">
-            <div id="menuToggle">
-                <input type="checkbox" />
-                <span></span>
-                <span></span>
-                <span></span>
-                <ul id="menu">
-                    <a href="#" onclick="openTab(event, 'Seller')">
-                        <li>Todo</li>
-                    </a>
-                    <a href="#" onclick="openTab(event, 'Cliente')">
-                        <li>Cliente</li>
-                    </a>
-                    <a href="#" onclick="openTab(event, 'Ruta')">
-                        <li>Ruta</li>
-                    </a>
-                </ul>
-            </div>
-        </nav>
-        <div class="container-fluid">
-            <div class="row">
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                    <h2>Rapport des Ventes</h2>
-                    <form method="get" action="" class="row g-3">
-                        <div class="col-auto">
-                            <label for="mes" class="form-label">Mois :</label>
-                            <select class="form-select" id="mes" name="mes">
-                                <?php
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+</head>
+<body>
+    <nav role="navigation">
+        <div id="menuToggle">
+            <input type="checkbox" />
+            <span></span>
+            <span></span>
+            <span></span>
+            <ul id="menu">
+                <a href="#" onclick="openTab(event, 'Seller')"><li>Todo</li></a>
+                <a href="#" onclick="openTab(event, 'Cliente')"><li>Cliente</li></a>
+                <a href="#" onclick="openTab(event, 'Ruta')"><li>Ruta</li></a>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <h2>Rapport des Ventes</h2>
+                <form method="get" action="" class="row g-3">
+                    <div class="col-auto">
+                        <label for="mes" class="form-label">Mois :</label>
+                        <select class="form-select" id="mes" name="mes">
+                            <?php
                                 $monthNames = [
                                     1 => 'Janvier',
                                     2 => 'Février',

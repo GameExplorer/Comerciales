@@ -6,8 +6,24 @@ if ($conn === false) {
 }
 
 // Initialisation des variables de filtre
-$MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
+$MES = isset($_GET['mes']) ? $_GET['mes'] : date('m');
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
+
+// Mapping array for month names
+$monthNames = array(
+    1 => 'Enero',
+    2 => 'Febrero',
+    3 => 'Marzo',
+    4 => 'Abril',
+    5 => 'Mayo',
+    6 => 'Junio',
+    7 => 'Julio',
+    8 => 'Agosto',
+    9 => 'Septiembre',
+    10 => 'Octubre',
+    11 => 'Noviembre',
+    12 => 'Diciembre'
+);
 
 // Requête SQL pour les ventes par ruta
 $sql_ruta = "
@@ -27,14 +43,14 @@ FROM AlbaranVentaCabecera AS AVC
 LEFT JOIN Comisionistas AS COMI ON COMI.CodigoComisionista = AVC.CodigoComisionista
 WHERE AVC.CodigoEmpresa = 1
     AND YEAR(AVC.FechaAlbaran) = ?
-    AND MONTH(AVC.FechaAlbaran) = ?
+    AND DATENAME(MONTH, AVC.FechaAlbaran) = ?
     AND AVC.CodigoRuta IN (91,92,93)
 GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
 ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
 ";
 
 // Préparation et exécution de la requête
-$params_ruta = array($ANNEE, $MES);
+$params_ruta = array($ANNEE, $monthNames[$MES]);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -63,14 +79,14 @@ SELECT
 FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
     AND YEAR(FechaAlbaran) = ?
-    AND MONTH(FechaAlbaran) = ?
+    AND DATENAME(MONTH, FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta, CodigoCliente, RazonSocial
 ORDER BY RUTA, CodigoCliente
 ";
 
 // Préparation et exécution de la requête
-$params_cliente = array($ANNEE, $MES);
+$params_cliente = array($ANNEE, $monthNames[$MES]);
 $stmt_cliente = sqlsrv_query($conn, $sql_cliente, $params_cliente);
 if ($stmt_cliente === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -97,13 +113,13 @@ SELECT
 FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
     AND YEAR(FechaAlbaran) = ?
-    AND MONTH(FechaAlbaran) = ?
+    AND DATENAME(MONTH, FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta
 ";
 
 // Préparation et exécution de la requête
-$params_all = array($ANNEE, $MES);
+$params_all = array($ANNEE, $monthNames[$MES]);
 $stmt_all = sqlsrv_query($conn, $sql_all, $params_all);
 if ($stmt_all === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -117,7 +133,6 @@ while ($row = sqlsrv_fetch_array($stmt_all, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_all);
 sqlsrv_close($conn);
-
 // Check if download is requested
 if (isset($_GET['download']) && $_GET['download'] === 'ruta') {
     header('Content-Type: text/csv');

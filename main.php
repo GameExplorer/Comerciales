@@ -203,6 +203,10 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
                                 </tr>
                             </thead>
                             <tbody>
+                            <div class="row">
+                            <div class="col-md-9">‎ ‎‎‎ </div><div class="col-md-4 pt-2"><a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta"
+                            class="btn btn-success">Download Ruta CSV</a></div>
+                                </div>
                                 <?php if (!empty($results_ruta)): ?>
                                     <?php foreach ($results_ruta as $row): ?>
                                         <tr>
@@ -224,8 +228,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
                                 <?php endif; ?>
                             </tbody>
                         </table>
-                        <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta"
-                            class="btn btn-secondary">Download Ruta CSV</a>
+                        
                     </div>
 
                     <!-- Tab content for Cliente -->
@@ -241,6 +244,10 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
                                 </tr>
                             </thead>
                             <tbody>
+                                <div class="row">
+                            <div class="col-md-9">‎ ‎‎‎ </div><div class="col-md-4 pt-2"><a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente"
+                            class="btn btn-success">Descargar cliente CSV</a></div>
+                                </div>
                                 <?php if (!empty($results_cliente)): ?>
                                     <?php foreach ($results_cliente as $row): ?>
                                         <tr>
@@ -268,8 +275,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
                                 <?php endif; ?>
                             </tbody>
                         </table>
-                        <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente"
-                            class="btn btn-secondary">Download Cliente CSV</a>
+                        
                     </div>
                 </main>
             </div>

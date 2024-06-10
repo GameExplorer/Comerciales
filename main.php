@@ -49,7 +49,6 @@ while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_ruta);
 
-
 // Requête SQL pour les ventes par client
 $sql_cliente = "
 SELECT
@@ -86,7 +85,6 @@ while ($row = sqlsrv_fetch_array($stmt_cliente, SQLSRV_FETCH_ASSOC)) {
 }
 
 sqlsrv_free_stmt($stmt_cliente);
-
 
 // Requête SQL pour les informations globales
 $sql_all = "
@@ -172,50 +170,58 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
 
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapport des Ventes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script>
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rapport des Ventes</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css">
+        <script>
+            function openTab(evt, tabName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.className += " active";
             }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-    </script>
-</head>
-<body>
-    <nav role="navigation">
-        <div id="menuToggle">
-            <input type="checkbox" />
-            <span></span>
-            <span></span>
-            <span></span>
-            <ul id="menu">
-                <a href="#" onclick="openTab(event, 'Seller')"><li>Todo</li></a>
-                <a href="#" onclick="openTab(event, 'Cliente')"><li>Cliente</li></a>
-                <a href="#" onclick="openTab(event, 'Ruta')"><li>Ruta</li></a>
-            </ul>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <div class="row">
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <h2>Rapport des Ventes</h2>
-                <form method="get" action="" class="row g-3">
-                    <div class="col-auto">
-                        <label for="mes" class="form-label">Mois :</label>
-                        <select class="form-select" id="mes" name="mes">
+        </script>
+    </head>
+
+    <body>
+        <nav role="navigation">
+            <div id="menuToggle">
+                <input type="checkbox" />
+                <span></span>
+                <span></span>
+                <span></span>
+                <ul id="menu">
+                    <a href="#" onclick="openTab(event, 'Seller')">
+                        <li>Todo</li>
+                    </a>
+                    <a href="#" onclick="openTab(event, 'Cliente')">
+                        <li>Cliente</li>
+                    </a>
+                    <a href="#" onclick="openTab(event, 'Ruta')">
+                        <li>Ruta</li>
+                    </a>
+                </ul>
+            </div>
+        </nav>
+        <div class="container-fluid">
+            <div class="row">
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <h2>Rapport des Ventes</h2>
+                    <form method="get" action="" class="row g-3">
+                        <div class="col-auto">
+                            <label for="mes" class="form-label">Mois :</label>
+                            <select class="form-select" id="mes" name="mes">
                             <?php
                             for ($i = 1; $i <= 12; $i++) {
                                 $selected = ($i == $MES) ? 'selected' : '';
@@ -267,19 +273,19 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                         </div>
                     </div>
                             <?php foreach ($results_ruta as $row): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['NumeroFactura']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['BRUTO']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['DTO']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                                </tr>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['NumeroFactura']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['BRUTO']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['DTO']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                    </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
@@ -306,13 +312,13 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                         </div>
                     </div>
                             <?php foreach ($results_cliente as $row): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                                </tr>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                    </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
@@ -337,11 +343,11 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                         </thead>
                         <tbody>
                             <?php foreach ($results_all as $row): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                                </tr>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                    </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>

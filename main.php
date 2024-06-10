@@ -9,23 +9,6 @@ if ($conn === false) {
 $MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
 
-$sql_all="
-SELECT 
-		CodigoRuta AS RUTA,
-		CASE
-			WHEN CodigoRuta = 91 THEN 'ROSA'
-			WHEN CodigoRuta = 92 THEN 'RUBEN'
-			WHEN CodigoRuta = 93 THEN 'SUSI'
-		END AS COMERCIAL,
-		CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
-
-FROM AlbaranVentaCabecera
-WHERE		CodigoEmpresa = 1
-		AND EjercicioAlbaran = @EJERCICIO
-		AND MONTH(FechaAlbaran) = @MES
-		AND CodigoRuta IN (91,92,93)
-GROUP BY CodigoRuta";
-
 // Requête SQL pour les ventes par ruta
 $sql_ruta = "
 SELECT 
@@ -101,6 +84,39 @@ while ($row = sqlsrv_fetch_array($stmt_cliente, SQLSRV_FETCH_ASSOC)) {
 }
 
 sqlsrv_free_stmt($stmt_cliente);
+
+// Requête SQL pour les informations globales
+$sql_all = "
+SELECT 
+    CodigoRuta AS RUTA,
+    CASE
+        WHEN CodigoRuta = 91 THEN 'ROSA'
+        WHEN CodigoRuta = 92 THEN 'RUBEN'
+        WHEN CodigoRuta = 93 THEN 'SUSI'
+    END AS COMERCIAL,
+    CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
+FROM AlbaranVentaCabecera
+WHERE CodigoEmpresa = 1
+    AND EjercicioAlbaran = ?
+    AND MONTH(FechaAlbaran) = ?
+    AND CodigoRuta IN (91,92,93)
+GROUP BY CodigoRuta
+";
+
+// Préparation et exécution de la requête
+$params_all = array($ANNEE, $MES);
+$stmt_all = sqlsrv_query($conn, $sql_all, $params_all);
+if ($stmt_all === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Récupération des résultats
+$results_all = array();
+while ($row = sqlsrv_fetch_array($stmt_all, SQLSRV_FETCH_ASSOC)) {
+    $results_all[] = $row;
+}
+
+sqlsrv_free_stmt($stmt_all);
 sqlsrv_close($conn);
 
 // Check if download is requested
@@ -127,6 +143,21 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
     fputcsv($output, array('RUTA', 'COMERCIAL', 'CLIENTE', 'RAZON SOCIAL', 'FACTURADO'));
 
     foreach ($results_cliente as $row) {
+        fputcsv($output, $row);
+    }
+
+    fclose($output);
+    exit;
+}
+
+if (isset($_GET['download']) && $_GET['download'] === 'all') {
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment;filename="ventas_all.csv"');
+
+    $output = fopen('php://output', 'w');
+    fputcsv($output, array('RUTA', 'COMERCIAL', 'FACTURADO'));
+
+    foreach ($results_all as $row) {
         fputcsv($output, $row);
     }
 
@@ -167,7 +198,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
             <span></span>
             <span></span>
             <ul id="menu">
-                <a href="#" onclick="openTab(event, 'Ruta')"><li>Seller</li></a>
+                <a href="#" onclick="openTab(event, 'Seller')"><li>Seller</li></a>
                 <a href="#" onclick="openTab(event, 'Cliente')"><li>Cliente</li></a>
                 <a href="#" onclick="openTab(event, 'Ruta')"><li>Ruta</li></a>
             </ul>
@@ -193,7 +224,8 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
                         <label for="annee" class="form-label">Année :</label>
                         <select class="form-select" id="annee" name="annee">
                             <?php
-                            for ($i = date('Y')-4; $i <= date('Y'); $i++) {
+                            $current_year = date('Y');
+                            for ($i = $current_year - 5; $i <= $current_year; $i++) {
                                 $selected = ($i == $ANNEE) ? 'selected' : '';
                                 echo "<option value=\"$i\" $selected>$i</option>";
                             }
@@ -277,6 +309,34 @@ if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
                         <div class="col-md-9">‎ ‎‎‎ </div>
                         <div class="col-md-4 pt-2">
                             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente" class="btn btn-success">Descargar cliente CSV</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab content for Seller -->
+                <div id="Seller" class="tabcontent">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>RUTA</th>
+                                <th>COMERCIAL</th>
+                                <th>FACTURADO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($results_all as $row): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-md-9">‎ ‎‎‎ </div>
+                        <div class="col-md-4 pt-2">
+                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=all" class="btn btn-success">Download Seller CSV</a>
                         </div>
                     </div>
                 </div>

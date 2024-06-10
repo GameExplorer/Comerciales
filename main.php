@@ -5,11 +5,7 @@ if ($conn === false) {
     exit;
 }
 
-// Initialisation des variables de filtre
-$MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
-$ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
-
-// Requête SQL pour les ventes par ruta
+// Fetch all data initially
 $sql_ruta = "
 SELECT 
     'Albaran' AS TIPO,
@@ -26,21 +22,16 @@ SELECT
 FROM AlbaranVentaCabecera AS AVC
 LEFT JOIN Comisionistas AS COMI ON COMI.CodigoComisionista = AVC.CodigoComisionista
 WHERE AVC.CodigoEmpresa = 1
-    AND YEAR(AVC.FechaAlbaran) = ?
-    AND MONTH(AVC.FechaAlbaran) = ?
     AND AVC.CodigoRuta IN (91,92,93)
 GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
 ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
 ";
 
-// Préparation et exécution de la requête
-$params_ruta = array($ANNEE, $MES);
-$stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
+$stmt_ruta = sqlsrv_query($conn, $sql_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-// Récupération des résultats
 $results_ruta = array();
 while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
     $results_ruta[] = $row;
@@ -48,7 +39,7 @@ while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_ruta);
 
-// Requête SQL pour les ventes par client
+// Fetch data for Cliente tab
 $sql_cliente = "
 SELECT
     CodigoRuta AS RUTA,
@@ -62,21 +53,16 @@ SELECT
     CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
 FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
-    AND YEAR(FechaAlbaran) = ?
-    AND MONTH(FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta, CodigoCliente, RazonSocial
 ORDER BY CodigoRuta, CodigoCliente, RazonSocial
 ";
 
-// Préparation et exécution de la requête
-$params_cliente = array($ANNEE, $MES);
-$stmt_cliente = sqlsrv_query($conn, $sql_cliente, $params_cliente);
+$stmt_cliente = sqlsrv_query($conn, $sql_cliente);
 if ($stmt_cliente === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-// Récupération des résultats
 $results_cliente = array();
 while ($row = sqlsrv_fetch_array($stmt_cliente, SQLSRV_FETCH_ASSOC)) {
     $results_cliente[] = $row;
@@ -84,7 +70,7 @@ while ($row = sqlsrv_fetch_array($stmt_cliente, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_cliente);
 
-// Requête SQL pour les informations globales
+// Fetch data for Seller tab
 $sql_all = "
 SELECT 
     CodigoRuta AS RUTA,
@@ -96,20 +82,15 @@ SELECT
     CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
 FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
-    AND YEAR(FechaAlbaran) = ?
-    AND MONTH(FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta
 ";
 
-// Préparation et exécution de la requête
-$params_all = array($ANNEE, $MES);
-$stmt_all = sqlsrv_query($conn, $sql_all, $params_all);
+$stmt_all = sqlsrv_query($conn, $sql_all);
 if ($stmt_all === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-// Récupération des résultats
 $results_all = array();
 while ($row = sqlsrv_fetch_array($stmt_all, SQLSRV_FETCH_ASSOC)) {
     $results_all[] = $row;
@@ -117,54 +98,7 @@ while ($row = sqlsrv_fetch_array($stmt_all, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_all);
 sqlsrv_close($conn);
-
-// Check if download is requested
-if (isset($_GET['download']) && $_GET['download'] === 'ruta') {
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment;filename="ventas_ruta.csv"');
-
-    $output = fopen('php://output', 'w');
-    fputcsv($output, array('TIPO', 'RUTA', 'COMISIONISTA', 'NOMBRE', 'FECHA', 'CodigoCliente', 'RazonSocial', 'NumeroFactura', 'BRUTO', 'DTO', 'FACTURADO'));
-
-    foreach ($results_ruta as $row) {
-        fputcsv($output, $row);
-    }
-
-    fclose($output);
-    exit;
-}
-
-if (isset($_GET['download']) && $_GET['download'] === 'cliente') {
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment;filename="ventas_cliente.csv"');
-
-    $output = fopen('php://output', 'w');
-    fputcsv($output, array('RUTA', 'COMERCIAL', 'CLIENTE', 'RAZON SOCIAL', 'FACTURADO'));
-
-    foreach ($results_cliente as $row) {
-        fputcsv($output, $row);
-    }
-
-    fclose($output);
-    exit;
-}
-
-if (isset($_GET['download']) && $_GET['download'] === 'all') {
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment;filename="ventas_all.csv"');
-
-    $output = fopen('php://output', 'w');
-    fputcsv($output, array('RUTA', 'COMERCIAL', 'FACTURADO'));
-
-    foreach ($results_all as $row) {
-        fputcsv($output, $row);
-    }
-
-    fclose($output);
-    exit;
-}
 ?>
-
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -176,6 +110,36 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="style.css">
         <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                function filterTable() {
+                    var mes = document.getElementById('mes').value;
+                    var annee = document.getElementById('annee').value;
+                    var tables = document.querySelectorAll('.tabcontent table tbody');
+
+                    tables.forEach(function (tbody) {
+                        var rows = tbody.querySelectorAll('tr');
+                        rows.forEach(function (row) {
+                            var fecha = row.querySelector('td:nth-child(5)').textContent;
+                            var dateParts = fecha.split('/');
+                            var rowMonth = dateParts[0];
+                            var rowYear = dateParts[2];
+
+                            if (rowMonth == mes && rowYear == annee) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    });
+                }
+
+                document.getElementById('mes').addEventListener('change', filterTable);
+                document.getElementById('annee').addEventListener('change', filterTable);
+
+                // Initial table filter
+                filterTable();
+            });
+
             function openTab(evt, tabName) {
                 var i, tabcontent, tablinks;
                 tabcontent = document.getElementsByClassName("tabcontent");
@@ -189,33 +153,6 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                 document.getElementById(tabName).style.display = "block";
                 evt.currentTarget.className += " active";
             }
-
-            function filterTable() {
-                var mes = document.getElementById('mes').value;
-                var annee = document.getElementById('annee').value;
-                var tables = document.querySelectorAll('.tabcontent table tbody');
-
-                tables.forEach(function (tbody) {
-                    var rows = tbody.querySelectorAll('tr');
-                    rows.forEach(function (row) {
-                        var fecha = row.querySelector('td:nth-child(5)').textContent;
-                        var dateParts = fecha.split('/');
-                        var rowMonth = dateParts[0];
-                        var rowYear = dateParts[2];
-
-                        if (rowMonth == mes && rowYear == annee) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-                });
-            }
-
-            document.addEventListener('DOMContentLoaded', function () {
-                document.getElementById('mes').addEventListener('change', filterTable);
-                document.getElementById('annee').addEventListener('change', filterTable);
-            });
         </script>
     </head>
 
@@ -328,7 +265,6 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-
                     </div>
 
                     <!-- Tab content for Cliente -->
@@ -362,7 +298,6 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-
                     </div>
 
                     <!-- Tab content for Seller -->
@@ -392,7 +327,6 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-
                     </div>
                 </main>
             </div>

@@ -256,6 +256,12 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                             </tr>
                         </thead>
                         <tbody>
+                        <div class="row">
+                        <div class="col-md-9">‎ ‎‎‎ </div>
+                        <div class="col-md-4 pt-2">
+                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta" class="btn btn-success">Descargar como CSV</a>
+                        </div>
+                    </div>
                             <?php foreach ($results_ruta as $row): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
@@ -273,12 +279,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <div class="row">
-                        <div class="col-md-9">‎ ‎‎‎ </div>
-                        <div class="col-md-4 pt-2">
-                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta" class="btn btn-success">Download Ruta CSV</a>
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <!-- Tab content for Cliente -->
@@ -294,6 +295,12 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                             </tr>
                         </thead>
                         <tbody>
+                        <div class="row">
+                        <div class="col-md-9">‎ ‎‎‎ </div>
+                        <div class="col-md-4 pt-2">
+                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente" class="btn btn-success">Descargar como CSV</a>
+                        </div>
+                    </div>
                             <?php foreach ($results_cliente as $row): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
@@ -305,17 +312,18 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <div class="row">
-                        <div class="col-md-9">‎ ‎‎‎ </div>
-                        <div class="col-md-4 pt-2">
-                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente" class="btn btn-success">Descargar cliente CSV</a>
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <!-- Tab content for Seller -->
                 <div id="Seller" class="tabcontent">
                     <table class="table">
+                    <div class="row">
+                        <div class="col-md-9">‎ ‎‎‎ </div>
+                        <div class="col-md-4 pt-2">
+                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=all" class="btn btn-success">Descargar como CSV</a>
+                        </div>
+                    </div>
                         <thead>
                             <tr>
                                 <th>RUTA</th>
@@ -333,12 +341,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <div class="row">
-                        <div class="col-md-9">‎ ‎‎‎ </div>
-                        <div class="col-md-4 pt-2">
-                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=all" class="btn btn-success">Download Seller CSV</a>
-                        </div>
-                    </div>
+                    
                 </div>
             </main>
         </div>

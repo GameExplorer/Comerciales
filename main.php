@@ -198,7 +198,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
             <span></span>
             <span></span>
             <ul id="menu">
-                <a href="#" onclick="openTab(event, 'Seller')"><li>Seller</li></a>
+                <a href="#" onclick="openTab(event, 'Seller')"><li>All</li></a>
                 <a href="#" onclick="openTab(event, 'Cliente')"><li>Cliente</li></a>
                 <a href="#" onclick="openTab(event, 'Ruta')"><li>Ruta</li></a>
             </ul>

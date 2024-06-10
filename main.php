@@ -1,5 +1,7 @@
 <?php
 include 'conexion_exit_pr.php';
+require 'Fecha.php';
+
 if ($conn === false) {
     echo "Error de conexión a la base de datos.";
     exit;
@@ -27,7 +29,8 @@ FROM AlbaranVentaCabecera AS AVC
 LEFT JOIN Comisionistas AS COMI ON COMI.CodigoComisionista = AVC.CodigoComisionista
 WHERE AVC.CodigoEmpresa = 1
     AND AVC.EjercicioAlbaran = ?
-    AND MONTH(AVC.FechaAlbaran) = ?
+    AND Fecha::MONTH(AVC.FechaAlbaran) = ?
+    AND Fecha::YEAR(AVC.FechaAlbaran) = ?
     AND AVC.CodigoRuta IN (91,92,93)
 GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
 ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
@@ -65,8 +68,8 @@ SELECT
 FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
     AND EjercicioAlbaran = ?
-    AND MONTH(FechaAlbaran) = ?
-    AND YEAR(FechaAlbaran) = ?
+    AND Fecha::MONTH(FechaAlbaran) = ?
+    AND Fecha::YEAR(FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta, CodigoCliente, RazonSocial
 ORDER BY RUTA, CodigoCliente
@@ -102,13 +105,14 @@ SELECT
 FROM AlbaranVentaCabecera
 WHERE CodigoEmpresa = 1
     AND EjercicioAlbaran = ?
-    AND MONTH(FechaAlbaran) = ?
+    AND Fecha::MONTH(FechaAlbaran) = ?
+    AND Fecha::YEAR(FechaAlbaran) = ?
     AND CodigoRuta IN (91,92,93)
 GROUP BY CodigoRuta
 ";
 
 // Prepare and execute the query
-$params_all = array($ANNEE, $MES);
+$params_all = array($ANNEE, $MES, $ANNEE);
 $stmt_all = sqlsrv_query($conn, $sql_all, $params_all);
 
 if ($stmt_all === false) {
@@ -223,7 +227,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
             <div class="row">
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <h2>Rapport des Ventes</h2>
-                    <form method="get" action="" class="row g-3">
+                    <form method="get" action="" class ChatGPT="row g-3">
                         <div class="col-auto">
                             <label for="mes" class="form-label">Mois :</label>
                             <select class="form-select" id="mes" name="mes">
@@ -265,7 +269,6 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                             <button type="submit" class="btn btn-primary">Filtrer</button>
                         </div>
                     </form>
-
                     <!-- Tab content for Ruta -->
                     <div id="Ruta" class="tabcontent">
                         <table class="table">

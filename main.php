@@ -175,51 +175,59 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
 
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapport des Ventes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script>
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rapport des Ventes</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css">
+        <script>
+            function openTab(evt, tabName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.className += " active";
             }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-    </script>
-</head>
-<body>
-    <nav role="navigation">
-        <div id="menuToggle">
-            <input type="checkbox" />
-            <span></span>
-            <span></span>
-            <span></span>
-            <ul id="menu">
-                <a href="#" onclick="openTab(event, 'Seller')"><li>Todo</li></a>
-                <a href="#" onclick="openTab(event, 'Cliente')"><li>Cliente</li></a>
-                <a href="#" onclick="openTab(event, 'Ruta')"><li>Ruta</li></a>
-            </ul>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <div class="row">
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <h2>Rapport des Ventes</h2>
-                <form method="get" action="" class="row g-3">
-                    <div class="col-auto">
-                        <label for="mes" class="form-label">Mois :</label>
-                        <select class="form-select" id="mes" name="mes">
-                            <?php
+        </script>
+    </head>
+
+    <body>
+        <nav role="navigation">
+            <div id="menuToggle">
+                <input type="checkbox" />
+                <span></span>
+                <span></span>
+                <span></span>
+                <ul id="menu">
+                    <a href="#" onclick="openTab(event, 'Seller')">
+                        <li>Todo</li>
+                    </a>
+                    <a href="#" onclick="openTab(event, 'Cliente')">
+                        <li>Cliente</li>
+                    </a>
+                    <a href="#" onclick="openTab(event, 'Ruta')">
+                        <li>Ruta</li>
+                    </a>
+                </ul>
+            </div>
+        </nav>
+        <div class="container-fluid">
+            <div class="row">
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <h2>Rapport des Ventes</h2>
+                    <form method="get" action="" class="row g-3">
+                        <div class="col-auto">
+                            <label for="mes" class="form-label">Mois :</label>
+                            <select class="form-select" id="mes" name="mes">
+                                <?php
                                 $monthNames = [
                                     1 => 'Janvier',
                                     2 => 'Février',
@@ -277,6 +285,14 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 </tr>
                             </thead>
                             <tbody>
+                                <div class="row">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-4 pt-2">
+                                        <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta"
+                                            class="btn btn-success">Descargar
+                                            como CSV</a>
+                                    </div>
+                                </div>
                                 <?php foreach ($results_ruta as $row): ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
@@ -294,13 +310,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                        <div class="row">
-                            <div class="col-md-9"></div>
-                            <div class="col-md-4 pt-2">
-                                <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=ruta"
-                                    class="btn btn-success">Descargar como CSV</a>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- Tab content for Cliente -->
@@ -316,6 +326,13 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 </tr>
                             </thead>
                             <tbody>
+                                <div class="row">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-4 pt-2">
+                                        <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente"
+                                            class="btn btn-success">Descargar como CSV</a>
+                                    </div>
+                                </div>
                                 <?php foreach ($results_cliente as $row): ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
@@ -327,13 +344,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                        <div class="row">
-                            <div class="col-md-9"></div>
-                            <div class="col-md-4 pt-2">
-                                <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=cliente"
-                                    class="btn btn-success">Descargar como CSV</a>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- Tab content for Seller -->
@@ -347,6 +358,14 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 </tr>
                             </thead>
                             <tbody>
+                                <div class="row">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-4 pt-2">
+                                        <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=all"
+                                            class="btn btn-success">Descargar
+                                            como CSV</a>
+                                    </div>
+                                </div>
                                 <?php foreach ($results_all as $row): ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
@@ -356,13 +375,7 @@ if (isset($_GET['download']) && $_GET['download'] === 'all') {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                        <div class="row">
-                            <div class="col-md-9"></div>
-                            <div class="col-md-4 pt-2">
-                                <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&download=all"
-                                    class="btn btn-success">Descargar como CSV</a>
-                            </div>
-                        </div>
+
                     </div>
                 </main>
             </div>

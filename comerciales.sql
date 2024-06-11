@@ -68,3 +68,13 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,      
+    username VARCHAR(50) UNIQUE NOT NULL,   
+    password VARCHAR(255) NOT NULL,       
+    codigo_ruta INT,     
+    disabled BOOLEAN,                   
+    role ENUM('user', 'boss') NOT NULL     -- user or boss
+);

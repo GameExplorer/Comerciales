@@ -100,46 +100,7 @@ sqlsrv_free_stmt($stmt_ruta);
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-        <style>
-            .sidenav {
-                height: 100%;
-                width: 0;
-                position: fixed;
-                z-index: 1;
-                top: 0;
-                left: 0;
-                background-color: #96c565;
-                overflow-x: hidden;
-                transition: 0.5s;
-                padding-top: 60px;
-            }
-
-            .sidenav a {
-                padding: 8px 8px 8px 32px;
-                text-decoration: none;
-                font-size: 25px;
-                color: white;
-                display: block;
-                transition: 0.3s;
-            }
-
-            .sidenav a:hover {
-                color: #f1f1f1;
-            }
-
-            .sidenav .closebtn {
-                position: absolute;
-                top: 0;
-                right: 25px;
-                font-size: 36px;
-                margin-left: 50px;
-            }
-
-            #main {
-                transition: margin-left 0.5s;
-                padding: 16px;
-            }
-        </style>
+        <link rel="stylesheet" href="style.css">
     </head>
 
     <body>

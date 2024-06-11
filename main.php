@@ -13,6 +13,18 @@ if ($conn === false) {
     exit;
 }
 
+// Fetch the current user's codigo_ruta
+$current_user = $_SESSION['username'];
+$sql_user = "SELECT codigo_ruta FROM users WHERE username = ?";
+$params_user = array($current_user);
+$stmt_user = sqlsrv_query($conn, $sql_user, $params_user);
+if ($stmt_user === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row_user = sqlsrv_fetch_array($stmt_user, SQLSRV_FETCH_ASSOC);
+$codigo_ruta = $row_user['codigo_ruta'];
+
 // Initialize filter variables
 $MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
@@ -36,7 +48,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND CodigoRuta IN (91,92,93)
+            AND CodigoRuta = ?
         GROUP BY CodigoRuta, CodigoCliente, RazonSocial
         ORDER BY RUTA, CodigoCliente
     ",
@@ -54,7 +66,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND CodigoRuta IN (91,92,93)
+            AND CodigoRuta = ?
         GROUP BY CodigoRuta
     ",
     'detalle_por_ruta' => "
@@ -77,7 +89,7 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-            AND AVC.CodigoRuta IN (91,92,93)
+            AND AVC.CodigoRuta = ?
         GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
     ",
@@ -85,7 +97,7 @@ $sql_queries = [
 
 // Prepare and execute the query
 $sql_ruta = $sql_queries[$queryType];
-$params_ruta = array($ANNEE, $MES);
+$params_ruta = array($ANNEE, $MES, $codigo_ruta);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));

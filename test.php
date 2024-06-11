@@ -109,7 +109,7 @@ sqlsrv_free_stmt($stmt_ruta);
                     <div class="col-md-3">
                         <label for="mes" class="form-label">Mes</label>
                         <select class="form-select" id="mes" name="mes">
-                            <?php for ($m = 1; $m <= 12; $m++): ?>
+                            <?php for ($m =2; $m <=13; $m++): ?>
                                 <option value="<?php echo $m; ?>" <?php if ($m == $MES)
                                        echo 'selected'; ?>>
                                     <?php echo date('F', mktime(0, 0, 0, $m, 10)); ?>

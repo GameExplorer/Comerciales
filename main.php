@@ -108,7 +108,7 @@ sqlsrv_free_stmt($stmt_ruta);
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_cliente">Ventas por
                 Cliente</a>
-            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_ruta">Ventas por Ruta</a>
+            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_ruta">Ventas por comerciales</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
         </div>
 
@@ -160,7 +160,7 @@ sqlsrv_free_stmt($stmt_ruta);
                                 <option value="ventas_por_cliente" <?php if ($queryType == 'ventas_por_cliente')
                                     echo 'selected'; ?>>Ventas por Cliente</option>
                                 <option value="ventas_por_ruta" <?php if ($queryType == 'ventas_por_ruta')
-                                    echo 'selected'; ?>>Ventas por Ruta</option>
+                                    echo 'selected'; ?>>Ventas por Comerciales</option>
                                 <option value="detalle_por_ruta" <?php if ($queryType == 'detalle_por_ruta')
                                     echo 'selected'; ?>>Detalle por Ruta</option>
                             </select>

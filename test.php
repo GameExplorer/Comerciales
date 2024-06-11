@@ -97,45 +97,67 @@ sqlsrv_free_stmt($stmt_ruta);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Database Display</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <script>
-        function openTab(evt, tabName, query) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-            
-            // Update form action to include the selected query
-            var form = document.getElementById("filterForm");
-            form.action = "?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=" + query;
+    <style>
+        /* The side navigation menu */
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
         }
-    </script>
-</head>
-<body onload="document.getElementById('defaultOpen').click();">
-    <nav role="navigation">
-        <div id="menuToggle">
-            <input type="checkbox" />
-            <span></span>
-            <span></span>
-            <span></span>
-            <ul id="menu">
-                <a href="#" class="tablinks" onclick="openTab(event, 'Cliente', 'ventas_por_cliente')" id="defaultOpen"><li>Cliente</li></a>
-                <a href="#" class="tablinks" onclick="openTab(event, 'Ruta', 'ventas_por_ruta')"><li>Ruta</li></a>
-                <a href="#" class="tablinks" onclick="openTab(event, 'Detalle', 'detalle_por_ruta')"><li>Detalle</li></a>
-            </ul>
-        </div>
-    </nav>
 
+        /* The navigation menu links */
+        .sidenav a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        /* When you mouse over the navigation links, change their color */
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+        /* Position and style the close button (top right corner) */
+        .sidenav .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        /* Style page content */
+        .main {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <a href="?query=ventas_por_cliente&mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>">Ventas por Cliente</a>
+    <a href="?query=ventas_por_ruta&mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>">Ventas por Ruta</a>
+    <a href="?query=detalle_por_ruta&mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>">Detalle por Ruta</a>
+</div>
+
+<div class="main">
+    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Open Menu</span>
     <div class="container mt-5">
-        <form method="GET" action="" id="filterForm">
+        <form method="GET" action="">
             <div class="row mb-3">
                 <div class="col-md-3">
                     <label for="mes" class="form-label">Mes</label>
@@ -157,117 +179,101 @@ sqlsrv_free_stmt($stmt_ruta);
                         <?php endfor; ?>
                     </select>
                 </div>
+                <div class="col-md-3">
+                    <label for="query" class="form-label">Tipo de Consulta</label>
+                    <select class="form-select" id="query" name="query">
+                        <option value="ventas_por_cliente" <?php if ($queryType == 'ventas_por_cliente') echo 'selected'; ?>>Ventas por Cliente</option>
+                        <option value="ventas_por_ruta" <?php if ($queryType == 'ventas_por_ruta') echo 'selected'; ?>>Ventas por Ruta</option>
+                        <option value="detalle_por_ruta" <?php if ($queryType == 'detalle_por_ruta') echo 'selected'; ?>>Detalle por Ruta</option>
+                    </select>
+                </div>
                 <div class="col-md-3 align-self-end">
                     <button type="submit" class="btn btn-primary">Filtrer</button>
                 </div>
             </div>
         </form>
 
-        <!-- Tab content for Cliente -->
-        <div id="Cliente" class="tabcontent">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>RUTA</th>
-                        <th>COMERCIAL</th>
-                        <th>CodigoCliente</th>
-                        <th>RazonSocial</th>
-                        <th>FACTURADO</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <div class="row">
-                        <div class="col-md-9">‎ ‎‎‎ </div>
-                        <div class="col-md-4 pt-2">
-                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_cliente&download=ruta" class="btn btn-success">Descargar como CSV</a>
-                        </div>
-                    </div>
-                    <?php foreach ($results_ruta as $row): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                            <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                            <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-
         <!-- Tab content for Ruta -->
         <div id="Ruta" class="tabcontent">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>RUTA</th>
-                        <th>COMERCIAL</th>
-                        <th>FACTURADO</th>
+                        <?php if ($queryType == 'detalle_por_ruta'): ?>
+                            <th>TIPO</th>
+                            <th>RUTA</th>
+                            <th>COMISIONISTA</th>
+                            <th>NOMBRE</th>
+                            <th>FECHA</th>
+                            <th>CodigoCliente</th>
+                            <th>RazonSocial</th>
+                            <th>NumeroFactura</th>
+                            <th>BRUTO</th>
+                            <th>DTO</th>
+                            <th>FACTURADO</th>
+                        <?php elseif ($queryType == 'ventas_por_ruta'): ?>
+                            <th>RUTA</th>
+                            <th>COMERCIAL</th>
+                            <th>FACTURADO</th>
+                        <?php else: ?>
+                            <th>RUTA</th>
+                            <th>COMERCIAL</th>
+                            <th>CodigoCliente</th>
+                            <th>RazonSocial</th>
+                            <th>FACTURADO</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
                     <div class="row">
                         <div class="col-md-9">‎ ‎‎‎ </div>
                         <div class="col-md-4 pt-2">
-                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_ruta&download=ruta" class="btn btn-success">Descargar como CSV</a>
+                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=<?php echo $queryType; ?>&download=ruta"
+                                class="btn btn-success">Descargar como CSV</a>
                         </div>
                     </div>
                     <?php foreach ($results_ruta as $row): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Tab content for Detalle -->
-        <div id="Detalle" class="tabcontent">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>TIPO</th>
-                        <th>RUTA</th>
-                        <th>COMISIONISTA</th>
-                        <th>NOMBRE</th>
-                        <th>FECHA</th>
-                        <th>CodigoCliente</th>
-                        <th>RazonSocial</th>
-                        <th>NumeroFactura</th>
-                        <th>BRUTO</th>
-                        <th>DTO</th>
-                        <th>FACTURADO</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <div class="row">
-                        <div class="col-md-9">‎ ‎‎‎ </div>
-                        <div class="col-md-4 pt-2">
-                            <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta&download=ruta" class="btn btn-success">Descargar como CSV</a>
-                        </div>
-                    </div>
-                    <?php foreach ($results_ruta as $row): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
-                            <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
-                            <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                            <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                            <td><?php echo htmlspecialchars($row['NumeroFactura']); ?></td>
-                            <td><?php echo htmlspecialchars($row['BRUTO']); ?></td>
-                            <td><?php echo htmlspecialchars($row['DTO']); ?></td>
-                            <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                            <?php if ($queryType == 'detalle_por_ruta'): ?>
+                                <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
+                                <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
+                                <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
+                                <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
+                                <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
+                                <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
+                                <td><?php echo htmlspecialchars($row['NumeroFactura']); ?></td>
+                                <td><?php echo htmlspecialchars($row['BRUTO']); ?></td>
+                                <td><?php echo htmlspecialchars($row['DTO']); ?></td>
+                                <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                            <?php elseif ($queryType == 'ventas_por_ruta'): ?>
+                                <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
+                                <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                            <?php else: ?>
+                                <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
+                                <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
+                                <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
+                                <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

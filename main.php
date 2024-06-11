@@ -20,6 +20,14 @@ $queryType = isset($_GET['query']) ? $_GET['query'] : 'ventas_por_cliente';
 $userCodigoRuta = $_SESSION['codigo_ruta'];
 $userRole = $_SESSION['role'];
 
+// Define page titles
+$pageTitles = [
+    'ventas_por_cliente' => 'Ventas por Cliente',
+    'ventas_por_ruta' => 'Ventas por Comerciales',
+    'detalle_por_ruta' => 'Detalle por Ruta'
+];
+$pageTitle = isset($pageTitles[$queryType]) ? $pageTitles[$queryType] : 'Ventas';
+
 // Define SQL queries
 $sql_queries = [
     'ventas_por_cliente' => "
@@ -107,7 +115,7 @@ sqlsrv_free_stmt($stmt_ruta);
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
+        <title><?php echo $pageTitle; ?></title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="style.css">
         <style>
@@ -134,12 +142,12 @@ sqlsrv_free_stmt($stmt_ruta);
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_cliente">Ventas por
                 Cliente</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_ruta">Ventas por
-                comerciales</a>
+                Comerciales</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
         </div>
 
         <div id="main">
-            <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Abrir Menú</span>
+            <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; <?php echo $pageTitle; ?></span>
             <div class="container mt-5">
                 <form method="GET" action="">
                     <div class="row mb-3">

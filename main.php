@@ -290,3 +290,5 @@ sqlsrv_free_stmt($stmt_ruta);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<!-- Error fetching user: Array ( [0] => Array ( [0] => 42S02 [SQLSTATE] => 42S02 [1] => 208 [code] => 208 [2] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]El nombre de objeto 'users' no es válido. [message] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]El nombre de objeto 'users' no es válido. ) )-->

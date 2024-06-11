@@ -108,7 +108,7 @@ sqlsrv_free_stmt($stmt_ruta);
                 z-index: 1;
                 top: 0;
                 left: 0;
-                background-color: #111;
+                background-color: #96c565;
                 overflow-x: hidden;
                 transition: 0.5s;
                 padding-top: 60px;
@@ -118,7 +118,7 @@ sqlsrv_free_stmt($stmt_ruta);
                 padding: 8px 8px 8px 32px;
                 text-decoration: none;
                 font-size: 25px;
-                color: #818181;
+                color: white;
                 display: block;
                 transition: 0.3s;
             }
@@ -152,7 +152,7 @@ sqlsrv_free_stmt($stmt_ruta);
         </div>
 
         <div id="main">
-            <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Abrir Menu</span>
+            <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>
             <div class="container mt-5">
                 <form method="GET" action="">
                     <div class="row mb-3">
@@ -178,7 +178,7 @@ sqlsrv_free_stmt($stmt_ruta);
                                 <?php endfor; ?>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <label for="query" class="form-label">Tipo de Consulta</label>
                             <select class="form-select" id="query" name="query">
                                 <option value="ventas_por_cliente" <?php if ($queryType == 'ventas_por_cliente')

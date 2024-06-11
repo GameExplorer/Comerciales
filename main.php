@@ -10,13 +10,15 @@ if (!isset($_SESSION['username'])) {
 
 if ($conn === false) {
     echo "Error de conexión a la base de datos.";
-    exit;
+    exit();
 }
 
 // Initialize filter variables
 $MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
 $queryType = isset($_GET['query']) ? $_GET['query'] : 'ventas_por_cliente';
+$userCodigoRuta = $_SESSION['codigo_ruta'];
+$userRole = $_SESSION['role'];
 
 // Define SQL queries
 $sql_queries = [
@@ -36,7 +38,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND CodigoRuta IN (91,92,93)
+            AND (CodigoRuta IN (91,92,93) OR ? = 'boss')
         GROUP BY CodigoRuta, CodigoCliente, RazonSocial
         ORDER BY RUTA, CodigoCliente
     ",
@@ -54,7 +56,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND CodigoRuta IN (91,92,93)
+            AND (CodigoRuta IN (91,92,93) OR ? = 'boss')
         GROUP BY CodigoRuta
     ",
     'detalle_por_ruta' => "
@@ -77,7 +79,7 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-            AND AVC.CodigoRuta IN (91,92,93)
+            AND (AVC.CodigoRuta IN (91,92,93) OR ? = 'boss')
         GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
     ",
@@ -85,7 +87,7 @@ $sql_queries = [
 
 // Prepare and execute the query
 $sql_ruta = $sql_queries[$queryType];
-$params_ruta = array($ANNEE, $MES);
+$params_ruta = array($ANNEE, $MES, $userRole);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -94,12 +96,13 @@ if ($stmt_ruta === false) {
 // Fetch results
 $results_ruta = array();
 while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
-    $results_ruta[] = $row;
+    if ($userRole == 'boss' || $row['RUTA'] == $userCodigoRuta) {
+        $results_ruta[] = $row;
+    }
 }
 
 sqlsrv_free_stmt($stmt_ruta);
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>

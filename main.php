@@ -13,23 +13,6 @@ if ($conn === false) {
     exit;
 }
 
-// Fetch the current user's codigo_ruta
-$current_user = $_SESSION['username'];
-$sql_user = "SELECT codigo_ruta FROM users WHERE username = ?";
-$params_user = array($current_user);
-$stmt_user = sqlsrv_query($conn, $sql_user, $params_user);
-if ($stmt_user === false) {
-    die("Error fetching user: " . print_r(sqlsrv_errors(), true));
-}
-
-$row_user = sqlsrv_fetch_array($stmt_user, SQLSRV_FETCH_ASSOC);
-
-if (!$row_user) {
-    die("No user found with username: $current_user");
-}
-
-$codigo_ruta = $row_user['codigo_ruta'];
-
 // Initialize filter variables
 $MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
@@ -53,7 +36,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND CodigoRuta = ?
+            AND CodigoRuta IN (91,92,93)
         GROUP BY CodigoRuta, CodigoCliente, RazonSocial
         ORDER BY RUTA, CodigoCliente
     ",
@@ -71,7 +54,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND CodigoRuta = ?
+            AND CodigoRuta IN (91,92,93)
         GROUP BY CodigoRuta
     ",
     'detalle_por_ruta' => "
@@ -94,7 +77,7 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-            AND AVC.CodigoRuta = ?
+            AND AVC.CodigoRuta IN (91,92,93)
         GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
     ",
@@ -102,10 +85,10 @@ $sql_queries = [
 
 // Prepare and execute the query
 $sql_ruta = $sql_queries[$queryType];
-$params_ruta = array($ANNEE, $MES, $codigo_ruta);
+$params_ruta = array($ANNEE, $MES);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
-    die("Error executing query: " . print_r(sqlsrv_errors(), true));
+    die(print_r(sqlsrv_errors(), true));
 }
 
 // Fetch results
@@ -116,6 +99,7 @@ while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
 
 sqlsrv_free_stmt($stmt_ruta);
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -142,7 +126,7 @@ sqlsrv_free_stmt($stmt_ruta);
 </head>
 <body>
     <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;$pageTitle</a>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_cliente">Ventas por Cliente</a>
         <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_ruta">Ventas por comerciales</a>
         <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
@@ -290,5 +274,3 @@ sqlsrv_free_stmt($stmt_ruta);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-<!-- Error fetching user: Array ( [0] => Array ( [0] => 42S02 [SQLSTATE] => 42S02 [1] => 208 [code] => 208 [2] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]El nombre de objeto 'users' no es válido. [message] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]El nombre de objeto 'users' no es válido. ) )-->

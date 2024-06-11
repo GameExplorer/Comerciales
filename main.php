@@ -19,10 +19,13 @@ $sql_user = "SELECT codigo_ruta FROM users WHERE username = ?";
 $params_user = array($current_user);
 $stmt_user = sqlsrv_query($conn, $sql_user, $params_user);
 if ($stmt_user === false) {
-    die(print_r(sqlsrv_errors(), true));
+    die("Error fetching user: " . print_r(sqlsrv_errors(), true));
 }
 
-$row_user = sqlsrv_fetch_array($stmt_user, SQLSRV_FETCH_ASSOC);
+if (!($row_user = sqlsrv_fetch_array($stmt_user, SQLSRV_FETCH_ASSOC))) {
+    die("No user found with username: $current_user");
+}
+
 $codigo_ruta = $row_user['codigo_ruta'];
 
 // Initialize filter variables

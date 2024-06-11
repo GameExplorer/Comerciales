@@ -202,25 +202,22 @@ sqlsrv_free_stmt($stmt_ruta);
                     <table class="table">
                         <thead>
                             <tr>
+                                <th>RUTA</th>
+                                <th>COMERCIAL</th>
                                 <?php if ($queryType == 'detalle_por_ruta'): ?>
                                     <th>TIPO</th>
-                                    <th>RUTA</th>
                                     <th>COMISIONISTA</th>
                                     <th>NOMBRE</th>
                                     <th>FECHA</th>
                                     <th>Código Cliente</th>
                                     <th>Razón Social</th>
-                                    <th>Número Factura</th>
+                                    <th>Numero Factura</th>
                                     <th>BRUTO</th>
                                     <th>DTO</th>
                                     <th>FACTURADO</th>
                                 <?php elseif ($queryType == 'ventas_por_ruta'): ?>
-                                    <th>RUTA</th>
-                                    <th>COMERCIAL</th>
                                     <th>FACTURADO</th>
                                 <?php else: ?>
-                                    <th>RUTA</th>
-                                    <th>COMERCIAL</th>
                                     <th>Código Cliente</th>
                                     <th>Razón Social</th>
                                     <th>FACTURADO</th>
@@ -237,9 +234,10 @@ sqlsrv_free_stmt($stmt_ruta);
                             </div>
                             <?php foreach ($results_ruta as $row): ?>
                                 <tr>
+                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
                                     <?php if ($queryType == 'detalle_por_ruta'): ?>
                                         <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
                                         <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
                                         <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
                                         <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
@@ -250,12 +248,8 @@ sqlsrv_free_stmt($stmt_ruta);
                                         <td><?php echo htmlspecialchars($row['DTO']); ?></td>
                                         <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
                                     <?php elseif ($queryType == 'ventas_por_ruta'): ?>
-                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
                                         <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
                                     <?php else: ?>
-                                        <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
                                         <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
                                         <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
                                         <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>

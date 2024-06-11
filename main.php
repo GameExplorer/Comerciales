@@ -101,47 +101,6 @@ sqlsrv_free_stmt($stmt_ruta);
         <title>Document</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="style.css">
-        <style>
-            .sidenav {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #96c565;
-  overflow-x: hidden;
-  transition: 0.5s;
-  padding-top: 60px;
-}
-
-.sidenav a {
-  padding: 8px 8px 8px 32px;
-  text-decoration: none;
-  font-size: 25px;
-  color: white;
-  display: block;
-  transition: 0.3s;
-}
-
-.sidenav a:hover {
-  color: #f1f1f1;
-}
-
-.sidenav .closebtn {
-  position: absolute;
-  top: 0;
-  right: 25px;
-  font-size: 36px;
-  margin-left: 50px;
-}
-
-#main {
-  transition: margin-left 0.5s;
-  padding: 16px;
-}
-
-        </style>
     </head>
 
     <body>
@@ -161,7 +120,6 @@ sqlsrv_free_stmt($stmt_ruta);
                         <div class="col-md-3">
                             <label for="mes" class="form-label">Mes</label>
                             <select class="form-select" id="mes" name="mes">
-<<<<<<< Updated upstream
                                 <?php
                                 $meses = [
                                     1 => 'Enero',
@@ -179,10 +137,6 @@ sqlsrv_free_stmt($stmt_ruta);
                                 ];
                                 foreach ($meses as $num => $nombre): ?>
                                     <option value="<?php echo $num; ?>" <?php if ($num == $MES)
-=======
-                                <?php for ($m = 2; $m <= 13; $m++): ?>
-                                    <option value="<?php echo $m; ?>" <?php if ($m == $MES)
->>>>>>> Stashed changes
                                            echo 'selected'; ?>>
                                         <?php echo $nombre; ?>
                                     </option>

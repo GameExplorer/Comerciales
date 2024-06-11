@@ -93,7 +93,7 @@ sqlsrv_free_stmt($stmt_ruta);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
     <head>
         <meta charset="UTF-8">
@@ -113,23 +113,38 @@ sqlsrv_free_stmt($stmt_ruta);
         </div>
 
         <div id="main">
-            <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>
+            <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Abrir Menú</span>
             <div class="container mt-5">
                 <form method="GET" action="">
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label for="mes" class="form-label">Mes</label>
                             <select class="form-select" id="mes" name="mes">
-                                <?php for ($m = 1; $m <= 12; $m++): ?>
-                                    <option value="<?php echo $m; ?>" <?php if ($m == $MES)
+                                <?php
+                                $meses = [
+                                    1 => 'Enero',
+                                    2 => 'Febrero',
+                                    3 => 'Marzo',
+                                    4 => 'Abril',
+                                    5 => 'Mayo',
+                                    6 => 'Junio',
+                                    7 => 'Julio',
+                                    8 => 'Agosto',
+                                    9 => 'Septiembre',
+                                    10 => 'Octubre',
+                                    11 => 'Noviembre',
+                                    12 => 'Diciembre'
+                                ];
+                                foreach ($meses as $num => $nombre): ?>
+                                    <option value="<?php echo $num; ?>" <?php if ($num == $MES)
                                            echo 'selected'; ?>>
-                                        <?php echo date('F', mktime(0, 0, 0, $m, 10)); ?>
+                                        <?php echo $nombre; ?>
                                     </option>
-                                <?php endfor; ?>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="annee" class="form-label">Année</label>
+                            <label for="annee" class="form-label">Año</label>
                             <select class="form-select" id="annee" name="annee">
                                 <?php for ($y = 2020; $y <= date('Y'); $y++): ?>
                                     <option value="<?php echo $y; ?>" <?php if ($y == $ANNEE)
@@ -151,7 +166,7 @@ sqlsrv_free_stmt($stmt_ruta);
                             </select>
                         </div>
                         <div class="col-md-3 align-self-end">
-                            <button type="submit" class="btn btn-primary">Filtrer</button>
+                            <button type="submit" class="btn btn-primary">Filtrar</button>
                         </div>
                     </div>
                 </form>
@@ -167,9 +182,9 @@ sqlsrv_free_stmt($stmt_ruta);
                                     <th>COMISIONISTA</th>
                                     <th>NOMBRE</th>
                                     <th>FECHA</th>
-                                    <th>CodigoCliente</th>
-                                    <th>RazonSocial</th>
-                                    <th>NumeroFactura</th>
+                                    <th>Código Cliente</th>
+                                    <th>Razón Social</th>
+                                    <th>Número Factura</th>
                                     <th>BRUTO</th>
                                     <th>DTO</th>
                                     <th>FACTURADO</th>
@@ -180,8 +195,8 @@ sqlsrv_free_stmt($stmt_ruta);
                                 <?php else: ?>
                                     <th>RUTA</th>
                                     <th>COMERCIAL</th>
-                                    <th>CodigoCliente</th>
-                                    <th>RazonSocial</th>
+                                    <th>Código Cliente</th>
+                                    <th>Razón Social</th>
                                     <th>FACTURADO</th>
                                 <?php endif; ?>
                             </tr>
@@ -239,5 +254,7 @@ sqlsrv_free_stmt($stmt_ruta);
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     </body>
+
+</html>
 
 </html>

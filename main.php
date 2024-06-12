@@ -2,9 +2,6 @@
 session_start();
 include 'conexion_exit_pr.php';
 
-// Connect to the user database
-$users_conn = new mysqli('user_db_host', 'user_db_username', 'user_db_password', 'user_db_name');
-
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
@@ -16,33 +13,12 @@ if ($conn === false) {
     exit();
 }
 
-if ($users_conn->connect_error) {
-    die("Connection failed: " . $users_conn->connect_error);
-}
-
-// Fetch user details
-$username = $_SESSION['username'];
-$user_sql = "SELECT codigo_ruta, role FROM users WHERE username = ?";
-$user_stmt = $users_conn->prepare($user_sql);
-$user_stmt->bind_param('s', $username);
-$user_stmt->execute();
-$user_result = $user_stmt->get_result();
-$user_data = $user_result->fetch_assoc();
-$user_stmt->close();
-$users_conn->close();
-
-if (!$user_data) {
-    echo "User not found.";
-    exit();
-}
-
-$userCodigoRuta = $user_data['codigo_ruta'];
-$userRole = $user_data['role'];
-
 // Initialize filter variables
 $MES = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
 $queryType = isset($_GET['query']) ? $_GET['query'] : 'ventas_por_cliente';
+$userCodigoRuta = $_SESSION['codigo_ruta'];
+$userRole = $_SESSION['role'];
 
 // Define page titles
 $pageTitles = [
@@ -70,7 +46,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND (? = 'boss' OR CodigoRuta = ?)
+            AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
             AND CodigoRuta IN (91, 92, 93)
         GROUP BY CodigoRuta, CodigoCliente, RazonSocial
         ORDER BY RUTA, CodigoCliente
@@ -89,7 +65,7 @@ $sql_queries = [
             CodigoEmpresa = 1
             AND EjercicioAlbaran = ?
             AND MONTH(FechaAlbaran) = ?
-            AND (? = 'boss' OR CodigoRuta = ?)
+            AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
             AND CodigoRuta IN (91, 92, 93)
         GROUP BY CodigoRuta
     ",
@@ -103,9 +79,9 @@ $sql_queries = [
             AVC.CodigoCliente,
             AVC.RazonSocial,
             AVC.NumeroFactura,
-            SUM(ISNULL(AVC.ImporteBruto, 0)) AS BRUTO,
-            SUM(ISNULL(AVC.ImporteDescuento, 0)) AS DTO,
-            SUM(ISNULL(AVC.ImporteFactura, 0)) AS FACTURADO
+            CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
+            CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
+            CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
         FROM AlbaranVentaCabecera AS AVC
         LEFT JOIN Comisionistas AS COMI
             ON COMI.CodigoComisionista = AVC.CodigoComisionista
@@ -113,31 +89,16 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-            AND (
-                ? = 'boss'
-                OR (
-                    ? = 'user' AND AVC.CodigoRuta = ?
-                )
-            )
+            AND (('boss' = ? AND ? = 0) OR AVC.CodigoRuta = ?)
             AND AVC.CodigoRuta IN (91, 92, 93)
-        GROUP BY 
-            AVC.CodigoRuta, 
-            AVC.CodigoComisionista, 
-            AVC.FechaAlbaran, 
-            AVC.CodigoCliente, 
-            AVC.RazonSocial, 
-            AVC.NumeroFactura, 
-            COMI.Comisionista
-        ORDER BY 
-            RUTA, 
-            AVC.FechaAlbaran, 
-            AVC.CodigoCliente
-    "
+        GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
+        ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
+    ",
 ];
 
 // Prepare and execute the query
 $sql_ruta = $sql_queries[$queryType];
-$params_ruta = [$ANNEE, $MES, $userRole, $userRole, $userCodigoRuta];
+$params_ruta = array($ANNEE, $MES, $userRole, $userCodigoRuta, $userCodigoRuta);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -223,82 +184,102 @@ sqlsrv_free_stmt($stmt_ruta);
                         <div class="col-md-3">
                             <label for="annee" class="form-label">Año</label>
                             <select class="form-select" id="annee" name="annee">
-                                <?php
-                                for ($i = 2020; $i <= date('Y'); $i++): ?>
-                                    <option value="<?php echo $i; ?>" <?php if ($i == $ANNEE)
+                                <?php for ($y = 2020; $y <= date('Y'); $y++): ?>
+                                    <option value="<?php echo $y; ?>" <?php if ($y == $ANNEE)
                                            echo 'selected'; ?>>
-                                        <?php echo $i; ?>
+                                        <?php echo $y; ?>
                                     </option>
                                 <?php endfor; ?>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <input type="hidden" name="query" value="<?php echo htmlspecialchars($queryType); ?>">
-                            <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
+                        <div class="col-md-3 d-none">
+                            <label for="query" class="form-label">Tipo de Consulta</label>
+                            <select class="form-select" id="query" name="query">
+                                <option value="ventas_por_cliente" <?php if ($queryType == 'ventas_por_cliente')
+                                    echo 'selected'; ?>>Ventas por Cliente</option>
+                                <option value="ventas_por_ruta" <?php if ($queryType == 'ventas_por_ruta')
+                                    echo 'selected'; ?>>Ventas por Comerciales</option>
+                                <option value="detalle_por_ruta" <?php if ($queryType == 'detalle_por_ruta')
+                                    echo 'selected'; ?>>Detalle por Ruta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 align-self-end">
+                            <button type="submit" class="btn btn-primary">Filtrar</button>
                         </div>
                     </div>
                 </form>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <?php if ($queryType == 'ventas_por_cliente'): ?>
-                                <th>Ruta</th>
-                                <th>Comercial</th>
-                                <th>Código Cliente</th>
-                                <th>Razón Social</th>
-                                <th>Facturado</th>
-                            <?php elseif ($queryType == 'ventas_por_ruta'): ?>
-                                <th>Ruta</th>
-                                <th>Comercial</th>
-                                <th>Facturado</th>
-                            <?php elseif ($queryType == 'detalle_por_ruta'): ?>
-                                <th>Tipo</th>
-                                <th>Ruta</th>
-                                <th>Comisionista</th>
-                                <th>Nombre</th>
-                                <th>Fecha</th>
-                                <th>Código Cliente</th>
-                                <th>Razón Social</th>
-                                <th>Número Factura</th>
-                                <th>Bruto</th>
-                                <th>Descuento</th>
-                                <th>Facturado</th>
-                            <?php endif; ?>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($results_ruta as $row): ?>
+
+                <!-- Tab content for Ruta -->
+                <div id="Ruta" class="tabcontent">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <?php if ($queryType == 'ventas_por_cliente'): ?>
-                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                <th>RUTA</th>
+                                <th>COMERCIAL</th>
+                                <?php if ($queryType == 'detalle_por_ruta'): ?>
+                                    <th>TIPO</th>
+                                    <th>COMISIONISTA</th>
+                                    <th>NOMBRE</th>
+                                    <th>FECHA</th>
+                                    <th>Código Cliente</th>
+                                    <th>Razón Social</th>
+                                    <th>Numero Factura</th>
+                                    <th>BRUTO</th>
+                                    <th>DTO</th>
+                                    <th>FACTURADO</th>
                                 <?php elseif ($queryType == 'ventas_por_ruta'): ?>
-                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['COMERCIAL']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
-                                <?php elseif ($queryType == 'detalle_por_ruta'): ?>
-                                    <td><?php echo htmlspecialchars($row['TIPO']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['RUTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['COMISIONISTA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['NOMBRE']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FECHA']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['CodigoCliente']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['RazonSocial']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['NumeroFactura']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['BRUTO']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['DTO']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['FACTURADO']); ?></td>
+                                    <th>FACTURADO</th>
+                                <?php else: ?>
+                                    <th>Código Cliente</th>
+                                    <th>Razón Social</th>
+                                    <th>FACTURADO</th>
                                 <?php endif; ?>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <div class="row">
+                                <div class="col-md-9">‎ ‎‎‎ </div>
+                                <div class="col-md-4 pt-2">
+                                    <a href="export_csv.php?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=<?php echo $queryType; ?>"
+                                        class="btn btn-success">Descargar como CSV</a>
+                                </div>
+                            </div>
+                            <?php foreach ($results_ruta as $row): ?>
+                                <?php if (isset($row['COMERCIAL']) && !is_null($row['COMERCIAL'])): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['RUTA'] ?? ''); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMERCIAL'] ?? ''); ?></td>
+                                        <?php if ($queryType == 'detalle_por_ruta'): ?>
+                                            <td><?php echo htmlspecialchars($row['TIPO'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['COMISIONISTA'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['NOMBRE'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['FECHA'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['CodigoCliente'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['RazonSocial'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['NumeroFactura'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['BRUTO'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['DTO'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['FACTURADO'] ?? ''); ?></td>
+                                        <?php elseif ($queryType == 'ventas_por_ruta'): ?>
+                                            <td><?php echo htmlspecialchars($row['FACTURADO'] ?? ''); ?></td>
+                                        <?php else: ?>
+                                            <td><?php echo htmlspecialchars($row['CodigoCliente'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['RazonSocial'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['FACTURADO'] ?? ''); ?></td>
+                                        <?php endif; ?>
+                                    </tr>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <button class="logout-btn" onclick="location.href='logout.php'">Logout</button>
+
+        <form method="POST" action="logout.php" style="display: inline;">
+            <button type="submit" class="logout-btn">Déconnexion</button>
+        </form>
+
         <script>
             function openNav() {
                 document.getElementById("mySidenav").style.width = "250px";
@@ -308,6 +289,8 @@ sqlsrv_free_stmt($stmt_ruta);
                 document.getElementById("mySidenav").style.width = "0";
             }
         </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 
 </html>

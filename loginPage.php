@@ -22,17 +22,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows == 1) {
         $row = $result->fetch_assoc();
 
-        if ($row['disabled'] == 0) { // Ensure the user is not disabled
-            $_SESSION['id'] = $row['id']; // Store user id in session
+        if ($row['disabled'] == 1) {
             $_SESSION['username'] = $username;
             $_SESSION['codigo_ruta'] = $row['codigo_ruta'];
             $_SESSION['role'] = $row['role'];
             header("Location: main.php");
             exit();
         } else {
-            echo "This user is disabled.";
+            echo "this user is disabled.";
         }
     } else {
-        echo "Invalid username and/or password.";
+        echo "Nom d'utilisateur et/ou mot de passe incorrect(s).";
     }
 }
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login</title>
+        <link rel="stylesheet" href="Login.css">
+        <style>
+            #brrr {
+                margin-top: 100px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container mt-5 pt-5" id="brrr">
+            <form method="POST">
+                <div>
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div>
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div>
+                    <input type="submit" value="Login">
+                    <span class="password-toggle" onclick="togglePassword()">Mostrar contraseña</span>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            function togglePassword() {
+                var passwordInput = document.getElementById("password");
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                } else {
+                    passwordInput.type = "password";
+                }
+            }
+        </script>
+    </body>
+
+</html>

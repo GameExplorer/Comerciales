@@ -4,7 +4,7 @@ include 'conexion_exit_pr.php';
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
-    header("Location: loginPage.php");
+    header("Location: login.php");
     exit();
 }
 
@@ -31,80 +31,89 @@ $pageTitle = $pageTitles[$queryType] ?? 'Ventas';
 // Define SQL queries
 $sql_queries = [
     'ventas_por_cliente' => "
-            SELECT
-                CodigoRuta AS RUTA,
-                CASE
-                    WHEN CodigoRuta = 91 THEN 'ROSA'
-                    WHEN CodigoRuta = 92 THEN 'RUBEN'
-                    WHEN CodigoRuta = 93 THEN 'SUSI'
-                END AS COMERCIAL,
-                CodigoCliente,
-                RazonSocial,
-                CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
-            FROM AlbaranVentaCabecera
-            WHERE
-                CodigoEmpresa = 1
-                AND EjercicioAlbaran = ?
-                AND MONTH(FechaAlbaran) = ?
-                AND ((1 = ?) OR CodigoRuta = ?)
-                AND CodigoRuta IN (91, 92, 93)
-            GROUP BY CodigoRuta, CodigoCliente, RazonSocial
-            ORDER BY RUTA, CodigoCliente
-        ",
+        SELECT
+            CodigoRuta AS RUTA,
+            CASE
+                WHEN CodigoRuta = 91 THEN 'ROSA'
+                WHEN CodigoRuta = 92 THEN 'RUBEN'
+                WHEN CodigoRuta = 93 THEN 'SUSI'
+            END AS COMERCIAL,
+            CodigoCliente,
+            RazonSocial,
+            CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
+        FROM AlbaranVentaCabecera
+        WHERE
+            CodigoEmpresa = 1
+            AND EjercicioAlbaran = ?
+            AND MONTH(FechaAlbaran) = ?
+            AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
+            AND CodigoRuta IN (91, 92, 93)
+        GROUP BY CodigoRuta, CodigoCliente, RazonSocial
+        ORDER BY RUTA, CodigoCliente
+    ",
     'ventas_por_ruta' => "
-            SELECT 
-                CodigoRuta AS RUTA,
-                CASE
-                    WHEN CodigoRuta = 91 THEN 'ROSA'
-                    WHEN CodigoRuta = 92 THEN 'RUBEN'
-                    WHEN CodigoRuta = 93 THEN 'SUSI'
-                END AS COMERCIAL,
-                CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
-            FROM AlbaranVentaCabecera
-            WHERE
-                CodigoEmpresa = 1
-                AND EjercicioAlbaran = ?
-                AND MONTH(FechaAlbaran) = ?
-                AND ((1 = ?) OR CodigoRuta = ?)
-                AND CodigoRuta IN (91, 92, 93)
-            GROUP BY CodigoRuta
-        ",
+        SELECT 
+            CodigoRuta AS RUTA,
+            CASE
+                WHEN CodigoRuta = 91 THEN 'ROSA'
+                WHEN CodigoRuta = 92 THEN 'RUBEN'
+                WHEN CodigoRuta = 93 THEN 'SUSI'
+            END AS COMERCIAL,
+            CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
+        FROM AlbaranVentaCabecera
+        WHERE
+            CodigoEmpresa = 1
+            AND EjercicioAlbaran = ?
+            AND MONTH(FechaAlbaran) = ?
+            AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
+            AND CodigoRuta IN (91, 92, 93)
+        GROUP BY CodigoRuta
+    ",
     'detalle_por_ruta' => "
-            SELECT 
-			'Albaran' AS TIPO,
-			AVC.CodigoRuta AS RUTA,
-			AVC.CodigoComisionista AS COMISIONISTA,
-			IIF(AVC.CodigoComisionista IN (51,3,25),COMI.Comisionista,'') AS NOMBRE,
-			CONVERT(VARCHAR,AVC.FechaAlbaran,101) AS FECHA,
-			AVC.CodigoCliente,
-			AVC.RazonSocial,
-			AVC.NumeroFactura,
-			CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
-			CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
-			CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
-
-	FROM AlbaranVentaCabecera AS AVC
-	LEFT JOIN Comisionistas AS COMI
-		ON	COMI.CodigoComisionista = AVC.CodigoComisionista
-	WHERE		AVC.CodigoEmpresa = 1
-			AND AVC.EjercicioAlbaran = ?
-			AND MONTH(AVC.FechaAlbaran) = ?
-			AND AVC.CodigoRuta IN (91,92,93)
-	GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
-	ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
-        ",
+           SELECT 
+            'Albaran' AS TIPO,
+            AVC.CodigoRuta AS RUTA,
+            AVC.CodigoComisionista AS COMISIONISTA,
+            IIF(AVC.CodigoComisionista IN (51,3,25), COMI.Comisionista, '') AS NOMBRE,
+            CONVERT(VARCHAR, AVC.FechaAlbaran, 101) AS FECHA,
+            AVC.CodigoCliente,
+            AVC.RazonSocial,
+            AVC.NumeroFactura,
+            SUM(ISNULL(AVC.ImporteBruto, 0)) AS BRUTO,
+            SUM(ISNULL(AVC.ImporteDescuento, 0)) AS DTO,
+            SUM(ISNULL(AVC.ImporteFactura, 0)) AS FACTURADO
+        FROM AlbaranVentaCabecera AS AVC
+        LEFT JOIN Comisionistas AS COMI
+            ON COMI.CodigoComisionista = AVC.CodigoComisionista
+        WHERE
+            AVC.CodigoEmpresa = 1
+            AND AVC.EjercicioAlbaran = ?
+            AND MONTH(AVC.FechaAlbaran) = ?
+            AND (
+                ? = 'boss'
+                OR (
+                    ? = 'user' AND AVC.CodigoRuta = ?
+                )
+            )
+            AND AVC.CodigoRuta IN (91, 92, 93)
+        GROUP BY 
+            AVC.CodigoRuta, 
+            AVC.CodigoComisionista, 
+            AVC.FechaAlbaran, 
+            AVC.CodigoCliente, 
+            AVC.RazonSocial, 
+            AVC.NumeroFactura, 
+            COMI.Comisionista
+        ORDER BY 
+            RUTA, 
+            AVC.FechaAlbaran, 
+            AVC.CodigoCliente
+",
 ];
 
-// Define SQL queries based on user role
-if ($userRole == 1) { // If the user is a boss
-    $sql_ruta = $sql_queries[$queryType];
-    $params_ruta = array($ANNEE, $MES, 1, $userCodigoRuta); // Set the role to 1
-} else { // If the user is not a boss
-    $sql_ruta = $sql_queries[$queryType];
-    $params_ruta = array($ANNEE, $MES, 0, $userCodigoRuta); // Set the role to 0
-}
-
 // Prepare and execute the query
+$sql_ruta = $sql_queries[$queryType];
+$params_ruta = array($ANNEE, $MES, $userRole, $userRole, $userCodigoRuta, $userCodigoRuta);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -117,7 +126,6 @@ while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
 }
 
 sqlsrv_free_stmt($stmt_ruta);
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -154,13 +162,7 @@ sqlsrv_free_stmt($stmt_ruta);
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_ruta">Ventas por
                 Comerciales</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
-            <?php
-                if($userRole==1){
-                    echo"<a href='controlPanel.php'>Control Panel</a>";
-                }
-            ?>
         </div>
-
 
         <div id="main">
             <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;

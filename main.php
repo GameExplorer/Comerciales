@@ -90,7 +90,7 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-            AND (? = 0 OR AVC.CodigoRuta = ?) -- Check if user's codigo_ruta is 0 or matches AVC.CodigoRuta
+AND (('boss' = ? AND ? = 0) OR CodigoRuta = ? OR ? = 'boss')
         GROUP BY 
             AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY 
@@ -100,7 +100,7 @@ $sql_queries = [
 
 // Prepare and execute the query
 $sql_ruta = $sql_queries[$queryType];
-$params_ruta = array($ANNEE, $MES, $userRole, $userCodigoRuta, $userCodigoRuta);
+$params_ruta = array($ANNEE, $MES, $userRole, $userRole, $userCodigoRuta);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -298,4 +298,3 @@ sqlsrv_free_stmt($stmt_ruta);
     </body>
 
 </html>
-Array ( [0] => Array ( [0] => 22018 [SQLSTATE] => 22018 [1] => 245 [code] => 245 [2] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Error de conversión al convertir el valor nvarchar 'boss' al tipo de datos int. [message] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Error de conversión al convertir el valor nvarchar 'boss' al tipo de datos int. ) )

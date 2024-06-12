@@ -22,18 +22,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows == 1) {
         $row = $result->fetch_assoc();
 
-        if ($row['disabled'] == 0) { // Ensure the user is not disabled
-            $_SESSION['id'] = $row['id']; // Store user id in session
+        if ($row['disabled'] == 1) {
             $_SESSION['username'] = $username;
             $_SESSION['codigo_ruta'] = $row['codigo_ruta'];
             $_SESSION['role'] = $row['role'];
             header("Location: main.php");
             exit();
         } else {
-            echo "This user is disabled.";
+            echo "this user is disabled.";
         }
     } else {
-        echo "Invalid username and/or password.";
+        echo "Nom d'utilisateur et/ou mot de passe incorrect(s).";
     }
 }
 ?>

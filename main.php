@@ -82,27 +82,38 @@ $sql_queries = [
 			CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
 			CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
 			CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
-
 	FROM AlbaranVentaCabecera AS AVC
 	LEFT JOIN Comisionistas AS COMI
 		ON	COMI.CodigoComisionista = AVC.CodigoComisionista
 	WHERE		AVC.CodigoEmpresa = 1
 			AND AVC.EjercicioAlbaran = ?
 			AND MONTH(AVC.FechaAlbaran) = ?
-			AND AVC.CodigoRuta IN (91,92,93)
+			AND (
+				(
+					-- Show all information if userRole is 1
+					? = 1
+				)
+				OR
+				(
+					-- Show only information of that user
+					? = 0
+					AND AVC.CodigoRuta IN (
+						SELECT codigo_ruta FROM users WHERE id = ?
+					)
+				)
+			)
 	GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
 	ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
-
         ",
 ];
 
 // Define SQL queries based on user role
 if ($userRole == 1) { // If the user is a boss
     $sql_ruta = $sql_queries[$queryType];
-    $params_ruta = array($ANNEE, $MES, 1, $userCodigoRuta); // Set the role to 1
+    $params_ruta = array($ANNEE, $MES, 1, $userCodigoRuta, $userCodigoRuta); // Set the role to 1
 } else { // If the user is not a boss
     $sql_ruta = $sql_queries[$queryType];
-    $params_ruta = array($ANNEE, $MES, 0, $userCodigoRuta); // Set the role to 0
+    $params_ruta = array($ANNEE, $MES, 0, 0, $_SESSION['id']); // Set the role to 0
 }
 
 // Prepare and execute the query
@@ -156,9 +167,9 @@ sqlsrv_free_stmt($stmt_ruta);
                 Comerciales</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
             <?php
-                if($userRole==1){
-                    echo"<a href='controlPanel.php'>Control Panel</a>";
-                }
+            if ($userRole == 1) {
+                echo "<a href='controlPanel.php'>Control Panel</a>";
+            }
             ?>
         </div>
 

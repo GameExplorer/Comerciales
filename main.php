@@ -147,6 +147,11 @@ sqlsrv_free_stmt($stmt_ruta);
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=ventas_por_ruta">Ventas por
                 Comerciales</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
+            <?php
+                if($userRole=="boss"){
+                    echo"<a href='controlPanel.php'>Control Panel</a>";
+                }
+            ?>
         </div>
 
         <div id="main">

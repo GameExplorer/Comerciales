@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 11 juin 2024 à 15:09
+-- Généré le : mer. 12 juin 2024 à 13:51
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -28,21 +28,23 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `users` (
-  `userID` int(50) NOT NULL,
+  `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  `BossCheck` tinyint(1) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `codigo_ruta` int(11) DEFAULT NULL,
+  `disabled` tinyint(1) DEFAULT NULL,
+  `role` enum('user','boss') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `users`
 --
 
-INSERT INTO `users` (`userID`, `username`, `password`, `BossCheck`) VALUES
-(1, 'ROSA', 'pass', 0),
-(2, 'RUBEN', 'pass', 0),
-(3, 'SUSI', 'pass', 0),
-(4, 'Salomon', 'pass', 1);
+INSERT INTO `users` (`id`, `username`, `password`, `codigo_ruta`, `disabled`, `role`) VALUES
+(1, 'ROSA', 'pass', 91, 1, 'user'),
+(2, 'RUBEN', 'pass', 92, 1, 'user'),
+(3, 'SUSI', 'pass', 93, 1, 'user'),
+(4, 'Salomon', 'pass', 0, 1, 'boss');
 
 --
 -- Index pour les tables déchargées
@@ -52,7 +54,8 @@ INSERT INTO `users` (`userID`, `username`, `password`, `BossCheck`) VALUES
 -- Index pour la table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`userID`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
 
 --
 -- AUTO_INCREMENT pour les tables déchargées
@@ -62,19 +65,9 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,      
-    username VARCHAR(50) UNIQUE NOT NULL,   
-    password VARCHAR(255) NOT NULL,       
-    codigo_ruta INT,     
-    disabled BOOLEAN,                   
-    role ENUM('user', 'boss') NOT NULL     -- user or boss
-);

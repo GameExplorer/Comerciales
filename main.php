@@ -37,6 +37,7 @@ $sql_queries = [
                 WHEN CodigoRuta = 91 THEN 'ROSA'
                 WHEN CodigoRuta = 92 THEN 'RUBEN'
                 WHEN CodigoRuta = 93 THEN 'SUSI'
+                ELSE 'UNKNOWN'
             END AS COMERCIAL,
             CodigoCliente,
             RazonSocial,
@@ -57,6 +58,7 @@ $sql_queries = [
                 WHEN CodigoRuta = 91 THEN 'ROSA'
                 WHEN CodigoRuta = 92 THEN 'RUBEN'
                 WHEN CodigoRuta = 93 THEN 'SUSI'
+                ELSE 'UNKNOWN'
             END AS COMERCIAL,
             CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
         FROM AlbaranVentaCabecera
@@ -71,6 +73,12 @@ $sql_queries = [
         SELECT 
             'Albaran' AS TIPO,
             AVC.CodigoRuta AS RUTA,
+            CASE
+                WHEN AVC.CodigoRuta = 91 THEN 'ROSA'
+                WHEN AVC.CodigoRuta = 92 THEN 'RUBEN'
+                WHEN AVC.CodigoRuta = 93 THEN 'SUSI'
+                ELSE 'UNKNOWN'
+            END AS COMERCIAL,
             AVC.CodigoComisionista AS COMISIONISTA,
             IIF(AVC.CodigoComisionista IN (51,3,25), COMI.Comisionista, '') AS NOMBRE,
             CONVERT(VARCHAR, AVC.FechaAlbaran, 101) AS FECHA,
@@ -203,8 +211,8 @@ sqlsrv_free_stmt($stmt_ruta);
                                     echo 'selected'; ?>>Detalle por Ruta</option>
                             </select>
                         </div>
-                        <div class="col-md-3 align-self-end">
-                            <button type="submit" class="btn btn-primary">Filtrar</button>
+                        <div class="col-md-3 pt-2">
+                            <button type="submit" class="btn btn-primary mt-4">Consultar</button>
                         </div>
                     </div>
                 </form>

@@ -30,12 +30,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Liaison des paramètres
             $stmt->bind_param("sssii", $username, $password, $codigoRuta, $disabled, $userId);
 
-            // Exécution de la requête
-            if ($stmt->execute()) {
-                echo "Les informations de l'utilisateur ont été mises à jour avec succès.";
-            } else {
-                echo "Erreur lors de la mise à jour des informations de l'utilisateur : " . $stmt->error;
-            }
+            // // Exécution de la requête
+            // if ($stmt->execute()) {
+            //     echo "Les informations de l'utilisateur ont été mises à jour avec succès.";
+            // } else {
+            //     echo "Erreur lors de la mise à jour des informations de l'utilisateur : " . $stmt->error;
+            // }
 
             // Fermeture du statement
             $stmt->close();

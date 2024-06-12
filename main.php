@@ -70,7 +70,7 @@ $sql_queries = [
         GROUP BY CodigoRuta
     ",
     'detalle_por_ruta' => "
-        SELECT 
+            SELECT 
             'Albaran' AS TIPO,
             AVC.CodigoRuta AS RUTA,
             AVC.CodigoComisionista AS COMISIONISTA,
@@ -79,9 +79,9 @@ $sql_queries = [
             AVC.CodigoCliente,
             AVC.RazonSocial,
             AVC.NumeroFactura,
-            CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
-            CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
-            CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
+            CAST(SUM(ISNULL(AVC.ImporteBruto, 0)) AS numeric(10,2)) AS BRUTO,
+            CAST(SUM(ISNULL(AVC.ImporteDescuento, 0)) AS numeric(10,2)) AS DTO,
+            CAST(SUM(ISNULL(AVC.ImporteFactura, 0)) AS numeric(10,2)) AS FACTURADO
         FROM AlbaranVentaCabecera AS AVC
         LEFT JOIN Comisionistas AS COMI
             ON COMI.CodigoComisionista = AVC.CodigoComisionista
@@ -89,7 +89,7 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-            AND (('boss' = ? AND ? = 0) OR AVC.CodigoRuta = ?)
+            AND ((? != 'user' AND ? != ?) OR AVC.CodigoRuta = ?)
             AND AVC.CodigoRuta IN (91, 92, 93)
         GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente

@@ -31,69 +31,73 @@ $pageTitle = $pageTitles[$queryType] ?? 'Ventas';
 // Define SQL queries
 $sql_queries = [
     'ventas_por_cliente' => "
-        SELECT
-            CodigoRuta AS RUTA,
-            CASE
-                WHEN CodigoRuta = 91 THEN 'ROSA'
-                WHEN CodigoRuta = 92 THEN 'RUBEN'
-                WHEN CodigoRuta = 93 THEN 'SUSI'
-            END AS COMERCIAL,
-            CodigoCliente,
-            RazonSocial,
-            CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
-        FROM AlbaranVentaCabecera
-        WHERE
-            CodigoEmpresa = 1
-            AND EjercicioAlbaran = ?
-            AND MONTH(FechaAlbaran) = ?
-            AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
-            AND CodigoRuta IN (91, 92, 93)
-        GROUP BY CodigoRuta, CodigoCliente, RazonSocial
-        ORDER BY RUTA, CodigoCliente
-    ",
+            SELECT
+                CodigoRuta AS RUTA,
+                CASE
+                    WHEN CodigoRuta = 91 THEN 'ROSA'
+                    WHEN CodigoRuta = 92 THEN 'RUBEN'
+                    WHEN CodigoRuta = 93 THEN 'SUSI'
+                END AS COMERCIAL,
+                CodigoCliente,
+                RazonSocial,
+                CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
+            FROM AlbaranVentaCabecera
+            WHERE
+                CodigoEmpresa = 1
+                AND EjercicioAlbaran = ?
+                AND MONTH(FechaAlbaran) = ?
+                AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
+                AND CodigoRuta IN (91, 92, 93)
+            GROUP BY CodigoRuta, CodigoCliente, RazonSocial
+            ORDER BY RUTA, CodigoCliente
+        ",
     'ventas_por_ruta' => "
-        SELECT 
-            CodigoRuta AS RUTA,
-            CASE
-                WHEN CodigoRuta = 91 THEN 'ROSA'
-                WHEN CodigoRuta = 92 THEN 'RUBEN'
-                WHEN CodigoRuta = 93 THEN 'SUSI'
-            END AS COMERCIAL,
-            CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
-        FROM AlbaranVentaCabecera
-        WHERE
-            CodigoEmpresa = 1
-            AND EjercicioAlbaran = ?
-            AND MONTH(FechaAlbaran) = ?
-            AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
-            AND CodigoRuta IN (91, 92, 93)
-        GROUP BY CodigoRuta
-    ",
+            SELECT 
+                CodigoRuta AS RUTA,
+                CASE
+                    WHEN CodigoRuta = 91 THEN 'ROSA'
+                    WHEN CodigoRuta = 92 THEN 'RUBEN'
+                    WHEN CodigoRuta = 93 THEN 'SUSI'
+                END AS COMERCIAL,
+                CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
+            FROM AlbaranVentaCabecera
+            WHERE
+                CodigoEmpresa = 1
+                AND EjercicioAlbaran = ?
+                AND MONTH(FechaAlbaran) = ?
+                AND (('boss' = ? AND ? = 0) OR CodigoRuta = ?)
+                AND CodigoRuta IN (91, 92, 93)
+            GROUP BY CodigoRuta
+        ",
     'detalle_por_ruta' => "
-        SELECT 
-            'Albaran' AS TIPO,
-            AVC.CodigoRuta AS RUTA,
-            AVC.CodigoComisionista AS COMISIONISTA,
-            IIF(AVC.CodigoComisionista IN (51,3,25), COMI.Comisionista, '') AS NOMBRE,
-            CONVERT(VARCHAR, AVC.FechaAlbaran, 101) AS FECHA,
-            AVC.CodigoCliente,
-            AVC.RazonSocial,
-            AVC.NumeroFactura,
-            CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
-            CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
-            CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
-        FROM AlbaranVentaCabecera AS AVC
-        LEFT JOIN Comisionistas AS COMI
-            ON COMI.CodigoComisionista = AVC.CodigoComisionista
-        WHERE
-            AVC.CodigoEmpresa = 1
-            AND AVC.EjercicioAlbaran = ?
-            AND MONTH(AVC.FechaAlbaran) = ?
-            AND (('boss' = ? AND ? = 0) OR AVC.CodigoRuta = ?)
-            AND AVC.CodigoRuta IN (91, 92, 93)
-        GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
-        ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
-    ",
+            SELECT 
+    'Albaran' AS TIPO,
+    AVC.CodigoRuta AS RUTA,
+    AVC.CodigoComisionista AS COMISIONISTA,
+    IIF(AVC.CodigoComisionista IN (51,3,25), COMI.Comisionista, '') AS NOMBRE,
+    CONVERT(VARCHAR, AVC.FechaAlbaran, 101) AS FECHA,
+    AVC.CodigoCliente,
+    AVC.RazonSocial,
+    AVC.NumeroFactura,
+    CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
+    CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
+    CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
+FROM 
+    AlbaranVentaCabecera AS AVC
+LEFT JOIN 
+    Comisionistas AS COMI ON COMI.CodigoComisionista = AVC.CodigoComisionista
+WHERE
+    AVC.CodigoEmpresa = 1
+    AND AVC.EjercicioAlbaran = ?
+    AND MONTH(AVC.FechaAlbaran) = ?
+    AND (('boss' = ? AND ? = 0) OR (AVC.CodigoRuta = ? AND ? = ?))
+    AND AVC.CodigoRuta IN (91, 92, 93)
+GROUP BY 
+    AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
+ORDER BY 
+    RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
+
+        ",
 ];
 
 // Prepare and execute the query

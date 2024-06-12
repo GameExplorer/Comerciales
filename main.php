@@ -19,7 +19,6 @@ $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
 $queryType = isset($_GET['query']) ? $_GET['query'] : 'ventas_por_cliente';
 $userCodigoRuta = $_SESSION['codigo_ruta'];
 $userRole = $_SESSION['role'];
-$userId = $_SESSION['id']; // Retrieve user id from session
 
 // Define page titles
 $pageTitles = [
@@ -83,24 +82,14 @@ $sql_queries = [
 			CAST(SUM(AVC.ImporteBruto) AS numeric(10,2)) AS BRUTO,
 			CAST(SUM(AVC.ImporteDescuento) AS numeric(10,2)) AS DTO,
 			CAST(SUM(AVC.ImporteFactura) AS numeric(10,2)) AS FACTURADO
+
 	FROM AlbaranVentaCabecera AS AVC
 	LEFT JOIN Comisionistas AS COMI
 		ON	COMI.CodigoComisionista = AVC.CodigoComisionista
 	WHERE		AVC.CodigoEmpresa = 1
 			AND AVC.EjercicioAlbaran = ?
 			AND MONTH(AVC.FechaAlbaran) = ?
-			AND (
-				(
-					-- Show all information if userRole is 1
-					? = 1
-				)
-				OR
-				(
-					-- Show only information of that user
-					? = 0
-					AND AVC.CodigoRuta = ?
-				)
-			)
+			AND AVC.CodigoRuta IN (91,92,93)
 	GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
 	ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
         ",
@@ -166,9 +155,9 @@ sqlsrv_free_stmt($stmt_ruta);
                 Comerciales</a>
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
             <?php
-            if ($userRole == 1) {
-                echo "<a href='controlPanel.php'>Control Panel</a>";
-            }
+                if($userRole==1){
+                    echo"<a href='controlPanel.php'>Control Panel</a>";
+                }
             ?>
         </div>
 

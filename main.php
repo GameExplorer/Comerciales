@@ -121,7 +121,6 @@ sqlsrv_free_stmt($stmt_ruta);
         <title><?php echo htmlspecialchars($pageTitle); ?></title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="style.css">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             .logout-btn {
                 position: absolute;
@@ -151,79 +150,131 @@ sqlsrv_free_stmt($stmt_ruta);
             <a href="?tab=show_yearly_graph">Show Yearly Graph</a> <!-- New tab -->
         </div>
 
+
         <div id="main">
             <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;
                 <?php echo htmlspecialchars($pageTitle); ?></span>
             <div class="container mt-5">
-                <!-- Existing Content -->
-                <?php if (isset($_GET['tab']) && $_GET['tab'] == 'show_yearly_graph'): ?>
-                    <h2>Yearly Graph</h2>
-                    <?php if ($userRole == 'boss'): ?>
-                        <form id="user-selection-form" method="POST">
-                            <label for="selected_user">Select User:</label>
-                            <select id="selected_user" name="selected_user" class="form-select">
+                <form method="GET" action="">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="mes" class="form-label">Mes</label>
+                            <select class="form-select" id="mes" name="mes">
                                 <?php
-                                $user_sql = "SELECT id, username FROM users WHERE disabled = 0";
-                                $user_stmt = sqlsrv_query($conn, $user_sql);
-                                while ($user_row = sqlsrv_fetch_array($user_stmt, SQLSRV_FETCH_ASSOC)): ?>
-                                    <option value="<?php echo $user_row['id']; ?>">
-                                        <?php echo htmlspecialchars($user_row['username']); ?>
+                                $meses = [
+                                    1 => 'Enero',
+                                    2 => 'Febrero',
+                                    3 => 'Marzo',
+                                    4 => 'Abril',
+                                    5 => 'Mayo',
+                                    6 => 'Junio',
+                                    7 => 'Julio',
+                                    8 => 'Agosto',
+                                    9 => 'Septiembre',
+                                    10 => 'Octubre',
+                                    11 => 'Noviembre',
+                                    12 => 'Diciembre'
+                                ];
+                                foreach ($meses as $num => $nombre): ?>
+                                    <option value="<?php echo $num; ?>" <?php if ($num == $MES)
+                                           echo 'selected'; ?>>
+                                        <?php echo $nombre; ?>
                                     </option>
-                                <?php endwhile;
-                                sqlsrv_free_stmt($user_stmt);
-                                ?>
+                                <?php endforeach; ?>
                             </select>
-                            <button type="button" class="btn btn-primary mt-2" onclick="loadGraphData()">Load Graph</button>
-                        </form>
-                    <?php endif; ?>
-                    <canvas id="yearlyGraph" width="400" height="200"></canvas>
-                    <script>
-                        function loadGraphData() {
-                            const selectedUser = document.getElementById('selected_user').value;
-                            fetch('fetch_graph_data.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ selected_user: selectedUser })
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    const labels = data.map(item => `Month ${item.mes}`);
-                                    const values = data.map(item => item.total_dias);
+                        </div>
+                        <div class="col-md-3">
+                            <label for="annee" class="form-label">Año</label>
+                            <select class="form-select" id="annee" name="annee">
+                                <?php for ($y = 2020; $y <= date('Y'); $y++): ?>
+                                    <option value="<?php echo $y; ?>" <?php if ($y == $ANNEE)
+                                           echo 'selected'; ?>>
+                                        <?php echo $y; ?>
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-none">
+                            <label for="query" class="form-label">Tipo de Consulta</label>
+                            <select class="form-select" id="query" name="query">
+                                <option value="ventas_por_cliente" <?php if ($queryType == 'ventas_por_cliente')
+                                    echo 'selected'; ?>>Ventas por Cliente</option>
+                                <option value="ventas_por_ruta" <?php if ($queryType == 'ventas_por_ruta')
+                                    echo 'selected'; ?>>Ventas por Comerciales</option>
+                                <option value="detalle_por_ruta" <?php if ($queryType == 'detalle_por_ruta')
+                                    echo 'selected'; ?>>Detalle por Ruta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 align-self-end">
+                            <button type="submit" class="btn btn-primary">Filtrar</button>
+                        </div>
+                    </div>
+                </form>
 
-                                    const ctx = document.getElementById('yearlyGraph').getContext('2d');
-                                    new Chart(ctx, {
-                                        type: 'bar',
-                                        data: {
-                                            labels: labels,
-                                            datasets: [{
-                                                label: 'Total Days in Month',
-                                                data: values,
-                                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                                borderColor: 'rgba(54, 162, 235, 1)',
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            scales: {
-                                                y: {
-                                                    beginAtZero: true
-                                                }
-                                            }
-                                        }
-                                    });
-                                });
-                        }
-
-                        // Load the graph data on page load if the user is not a boss
-                        <?php if ($userRole != 'boss'): ?>
-                            loadGraphData();
-                        <?php endif; ?>
-                    </script>
-                <?php else: ?>
-                    <!-- Existing Content Here -->
-                <?php endif; ?>
+                <!-- Tab content for Ruta -->
+                <div id="Ruta" class="tabcontent">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>RUTA</th>
+                                <th>COMERCIAL</th>
+                                <?php if ($queryType == 'detalle_por_ruta'): ?>
+                                    <th>TIPO</th>
+                                    <th>COMISIONISTA</th>
+                                    <th>NOMBRE</th>
+                                    <th>FECHA</th>
+                                    <th>Código Cliente</th>
+                                    <th>Razón Social</th>
+                                    <th>Numero Factura</th>
+                                    <th>BRUTO</th>
+                                    <th>DTO</th>
+                                    <th>FACTURADO</th>
+                                <?php elseif ($queryType == 'ventas_por_ruta'): ?>
+                                    <th>FACTURADO</th>
+                                <?php else: ?>
+                                    <th>Código Cliente</th>
+                                    <th>Razón Social</th>
+                                    <th>FACTURADO</th>
+                                <?php endif; ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <div class="row">
+                                <div class="col-md-9">‎ ‎‎‎ </div>
+                                <div class="col-md-4 pt-2">
+                                    <a href="export_csv.php?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=<?php echo $queryType; ?>"
+                                        class="btn btn-success">Descargar como CSV</a>
+                                </div>
+                            </div>
+                            <?php foreach ($results_ruta as $row): ?>
+                                <?php if (isset($row['COMERCIAL']) && !is_null($row['COMERCIAL'])): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['RUTA'] ?? ''); ?></td>
+                                        <td><?php echo htmlspecialchars($row['COMERCIAL'] ?? ''); ?></td>
+                                        <?php if ($queryType == 'detalle_por_ruta'): ?>
+                                            <td><?php echo htmlspecialchars($row['TIPO'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['COMISIONISTA'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['NOMBRE'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['FECHA'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['CodigoCliente'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['RazonSocial'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['NumeroFactura'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['BRUTO'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['DTO'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['FACTURADO'] ?? ''); ?></td>
+                                        <?php elseif ($queryType == 'ventas_por_ruta'): ?>
+                                            <td><?php echo htmlspecialchars($row['FACTURADO'] ?? ''); ?></td>
+                                        <?php else: ?>
+                                            <td><?php echo htmlspecialchars($row['CodigoCliente'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['RazonSocial'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($row['FACTURADO'] ?? ''); ?></td>
+                                        <?php endif; ?>
+                                    </tr>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

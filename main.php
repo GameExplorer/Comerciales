@@ -113,7 +113,7 @@ $sql_queries = [
 
 // Prepare and execute the query
 $sql_ruta = $sql_queries[$queryType];
-$params_ruta = array($ANNEE, $MES, $userRole, $userRole, $userCodigoRuta, $userCodigoRuta);
+$params_ruta = array($ANNEE, $MES, $userRole, $userCodigoRuta, $userCodigoRuta);
 $stmt_ruta = sqlsrv_query($conn, $sql_ruta, $params_ruta);
 if ($stmt_ruta === false) {
     die(print_r(sqlsrv_errors(), true));

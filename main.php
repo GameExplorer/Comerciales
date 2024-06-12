@@ -4,7 +4,7 @@ include 'conexion_exit_pr.php';
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
-    header("Location: loginPage.php");
+    header("Location: login.php");
     exit();
 }
 
@@ -160,7 +160,6 @@ sqlsrv_free_stmt($stmt_ruta);
             }
             ?>
         </div>
-
 
         <div id="main">
             <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;

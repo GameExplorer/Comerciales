@@ -89,7 +89,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "<td>" . $row["username"] . "</td>";
                 echo "<td>" . $row["password"] . "</td>";
                 echo "<td>" . $row["codigo_ruta"] . "</td>";
-                echo "<td>" . $row["role"] . "</td>";
+                if($row["role"]==1){
+                    echo "<td>Boss</td>";
+                }else{
+                    echo "<td>User</td>";
+                }
                 echo "<td>";
 
                 echo "<input type='checkbox' disabled ";

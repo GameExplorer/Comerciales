@@ -309,3 +309,5 @@ sqlsrv_free_stmt($stmt_ruta);
     </body>
 
 </html>
+
+Array ( [0] => Array ( [0] => 22018 [SQLSTATE] => 22018 [1] => 245 [code] => 245 [2] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Error de conversión al convertir el valor varchar 'user' al tipo de datos int. [message] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Error de conversión al convertir el valor varchar 'user' al tipo de datos int. ) )

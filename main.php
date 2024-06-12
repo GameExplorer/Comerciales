@@ -70,7 +70,7 @@ $sql_queries = [
         GROUP BY CodigoRuta
     ",
     'detalle_por_ruta' => "
-            SELECT 
+           SELECT 
         'Albaran' AS TIPO,
         AVC.CodigoRuta AS RUTA,
         AVC.CodigoComisionista AS COMISIONISTA,
@@ -79,9 +79,9 @@ $sql_queries = [
         AVC.CodigoCliente,
         AVC.RazonSocial,
         AVC.NumeroFactura,
-        CAST(SUM(ISNULL(AVC.ImporteBruto, 0)) AS numeric(10,2)) AS BRUTO,
-        CAST(SUM(ISNULL(AVC.ImporteDescuento, 0)) AS numeric(10,2)) AS DTO,
-        CAST(SUM(ISNULL(AVC.ImporteFactura, 0)) AS numeric(10,2)) AS FACTURADO
+        SUM(ISNULL(AVC.ImporteBruto, 0)) AS BRUTO,
+        SUM(ISNULL(AVC.ImporteDescuento, 0)) AS DTO,
+        SUM(ISNULL(AVC.ImporteFactura, 0)) AS FACTURADO
     FROM AlbaranVentaCabecera AS AVC
     LEFT JOIN Comisionistas AS COMI
         ON COMI.CodigoComisionista = AVC.CodigoComisionista

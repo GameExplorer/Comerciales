@@ -71,28 +71,43 @@ $sql_queries = [
     ",
     'detalle_por_ruta' => "
            SELECT 
-        'Albaran' AS TIPO,
-        AVC.CodigoRuta AS RUTA,
-        AVC.CodigoComisionista AS COMISIONISTA,
-        IIF(AVC.CodigoComisionista IN (51,3,25), COMI.Comisionista, '') AS NOMBRE,
-        CONVERT(VARCHAR, AVC.FechaAlbaran, 101) AS FECHA,
-        AVC.CodigoCliente,
-        AVC.RazonSocial,
-        AVC.NumeroFactura,
-        SUM(ISNULL(AVC.ImporteBruto, 0)) AS BRUTO,
-        SUM(ISNULL(AVC.ImporteDescuento, 0)) AS DTO,
-        SUM(ISNULL(AVC.ImporteFactura, 0)) AS FACTURADO
-    FROM AlbaranVentaCabecera AS AVC
-    LEFT JOIN Comisionistas AS COMI
-        ON COMI.CodigoComisionista = AVC.CodigoComisionista
-    WHERE
-        AVC.CodigoEmpresa = 1
-        AND AVC.EjercicioAlbaran = ?
-        AND MONTH(AVC.FechaAlbaran) = ?
-        AND ((? = 'boss') OR (? != 'user' AND ? != ? AND AVC.CodigoRuta = ?))
-        AND AVC.CodigoRuta IN (91, 92, 93)
-    GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
-    ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
+            'Albaran' AS TIPO,
+            AVC.CodigoRuta AS RUTA,
+            AVC.CodigoComisionista AS COMISIONISTA,
+            IIF(AVC.CodigoComisionista IN (51,3,25), COMI.Comisionista, '') AS NOMBRE,
+            CONVERT(VARCHAR, AVC.FechaAlbaran, 101) AS FECHA,
+            AVC.CodigoCliente,
+            AVC.RazonSocial,
+            AVC.NumeroFactura,
+            SUM(ISNULL(AVC.ImporteBruto, 0)) AS BRUTO,
+            SUM(ISNULL(AVC.ImporteDescuento, 0)) AS DTO,
+            SUM(ISNULL(AVC.ImporteFactura, 0)) AS FACTURADO
+        FROM AlbaranVentaCabecera AS AVC
+        LEFT JOIN Comisionistas AS COMI
+            ON COMI.CodigoComisionista = AVC.CodigoComisionista
+        WHERE
+            AVC.CodigoEmpresa = 1
+            AND AVC.EjercicioAlbaran = ?
+            AND MONTH(AVC.FechaAlbaran) = ?
+            AND (
+                ? = 'boss'
+                OR (
+                    ? = 'user' AND AVC.CodigoRuta = ?
+                )
+            )
+            AND AVC.CodigoRuta IN (91, 92, 93)
+        GROUP BY 
+            AVC.CodigoRuta, 
+            AVC.CodigoComisionista, 
+            AVC.FechaAlbaran, 
+            AVC.CodigoCliente, 
+            AVC.RazonSocial, 
+            AVC.NumeroFactura, 
+            COMI.Comisionista
+        ORDER BY 
+            RUTA, 
+            AVC.FechaAlbaran, 
+            AVC.CodigoCliente
 ",
 ];
 

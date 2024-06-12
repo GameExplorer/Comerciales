@@ -90,7 +90,7 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-            AND (? = 0 OR AVC.codigo_ruta = ?) -- Check if user's codigo_ruta is 0 or matches AVC.CodigoRuta
+            AND (? = 0 OR AVC.CodigoRuta = ?) -- Check if user's codigo_ruta is 0 or matches AVC.CodigoRuta
         GROUP BY 
             AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY 

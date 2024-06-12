@@ -298,4 +298,4 @@ sqlsrv_free_stmt($stmt_ruta);
     </body>
 
 </html>
-Array ( [0] => Array ( [0] => 42S22 [SQLSTATE] => 42S22 [1] => 207 [code] => 207 [2] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]El nombre de columna 'codigo_ruta' no es válido. [message] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]El nombre de columna 'codigo_ruta' no es válido. ) )
+Array ( [0] => Array ( [0] => 22018 [SQLSTATE] => 22018 [1] => 245 [code] => 245 [2] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Error de conversión al convertir el valor nvarchar 'boss' al tipo de datos int. [message] => [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Error de conversión al convertir el valor nvarchar 'boss' al tipo de datos int. ) )

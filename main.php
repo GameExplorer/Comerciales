@@ -90,7 +90,6 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
-AND (('boss' = ? AND ? = 0) OR CodigoRuta = ? OR ? = 'boss')
         GROUP BY 
             AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY 

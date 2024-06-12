@@ -86,17 +86,18 @@ FROM
     AlbaranVentaCabecera AS AVC
 LEFT JOIN 
     Comisionistas AS COMI ON COMI.CodigoComisionista = AVC.CodigoComisionista
-WHERE
+WHERE 
     AVC.CodigoEmpresa = 1
-    AND AVC.EjercicioAlbaran = ?
-    AND MONTH(AVC.FechaAlbaran) = ?
-    AND (('boss' = ? AND ? = 0) OR (AVC.CodigoRuta = ? AND ? = ?))
-    AND AVC.CodigoRuta IN (91, 92, 93)
+    AND AVC.EjercicioAlbaran = @EJERCICIO
+    AND MONTH(AVC.FechaAlbaran) = @MES
+    AND (
+        ? = 0 OR 
+        (AVC.CodigoRuta = ? AND AVC.CodigoRuta <> 0)
+    ) -- Check if codigo_ruta is 0 or matches user's codigo_ruta
 GROUP BY 
     AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
 ORDER BY 
     RUTA, AVC.FechaAlbaran, AVC.CodigoCliente
-
         ",
 ];
 

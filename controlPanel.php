@@ -1,54 +1,29 @@
 <?php
-include 'conexion_db.php'; // Assurez-vous d'inclure votre fichier de connexion à la base de données
+include 'conexion_db.php'; // Make sure to include your database connection file
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Vérification des champs du formulaire
     if (isset($_POST['editUserId']) && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['codigoRuta'])) {
-        // Récupération des données du formulaire
         $userId = $_POST['editUserId'];
         $username = $_POST['username'];
         $password = $_POST['password'];
         $codigoRuta = $_POST['codigoRuta'];
-
-        // Vérification de l'état de la case à cocher "Disabled"
         $disabled = isset($_POST['disabled']) ? 1 : 0;
 
-        // // Afficher les données pour débogage
-        // echo "UserID: " . $userId . "<br>";
-        // echo "Username: " . $username . "<br>";
-        // echo "Password: " . $password . "<br>";
-        // echo "Codigo Ruta: " . $codigoRuta . "<br>";
-        // echo "Disabled: " . $disabled . "<br>";
-
-        // Préparation de la requête SQL d'update
         $sql = "UPDATE users SET username=?, password=?, codigo_ruta=?, disabled=? WHERE id=?";
-
-        // Préparation de la requête
         $stmt = $conn->prepare($sql);
 
         if ($stmt) {
-            // Liaison des paramètres
             $stmt->bind_param("sssii", $username, $password, $codigoRuta, $disabled, $userId);
-
-            // // Exécution de la requête
-            // if ($stmt->execute()) {
-            //     echo "Les informations de l'utilisateur ont été mises à jour avec succès.";
-            // } else {
-            //     echo "Erreur lors de la mise à jour des informations de l'utilisateur : " . $stmt->error;
-            // }
-
-            // Fermeture du statement
+            $stmt->execute();
             $stmt->close();
         } else {
-            echo "Erreur de préparation de la requête : " . $conn->error;
+            echo "Error preparing query: " . $conn->error;
         }
     } else {
-        echo "Tous les champs du formulaire doivent être définis.";
+        echo "All form fields must be defined.";
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -154,41 +129,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
         </div>
+
         <!-- Script for loading user data into the form when editing -->
         <script>
-            $(document).ready(function () {
-                $('.editUsersBtn').click(function () {
-                    var userId = $(this).data('user-id');
-                    var username = $(this).data('user-username');
-                    var password = $(this).data('user-password');
-                    var codigoRuta = $(this).data('user-codigo_ruta');
-                    var role = $(this).data('user-role');
-                    var disabled = $(this).data('user-disabled');
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.editUsersBtn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        var userId = this.getAttribute('data-user-id');
+                        var username = this.getAttribute('data-user-username');
+                        var password = this.getAttribute('data-user-password');
+                        var codigoRuta = this.getAttribute('data-user-codigo_ruta');
+                        var disabled = this.getAttribute('data-user-disabled');
 
-                    $('#editUserId').val(userId);
-                    $('#username').val(username);
-                    $('#password').val(password);
-                    $('#codigoRuta').val(codigoRuta);
-                    $('#role').val(role);
-                    if (disabled == 1) {
-                        $('#disabled').prop('checked', true);
-                    } else {
-                        $('#disabled').prop('checked', false);
-                    }
+                        document.getElementById('editUserId').value = userId;
+                        document.getElementById('username').value = username;
+                        document.getElementById('password').value = password;
+                        document.getElementById('codigoRuta').value = codigoRuta;
+                        document.getElementById('disabled').checked = disabled == '1';
+                    });
                 });
             });
         </script>
 
         <!-- Script for clearing the fields when adding a new user -->
         <script>
-            $(document).ready(function () {
-                $('.btnAdd').click(function () {
-                    $('#editUserId').val('');
-                    $('#username').val('');
-                    $('#password').val('');
-                    $('#codigoRuta').val('');
-                    $('#role').val('');
-                    $('#disabled').prop('checked', false);
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.btnAdd').forEach(button => {
+                    button.addEventListener('click', function () {
+                        document.getElementById('editUserId').value = '';
+                        document.getElementById('username').value = '';
+                        document.getElementById('password').value = '';
+                        document.getElementById('codigoRuta').value = '';
+                        document.getElementById('disabled').checked = false;
+                    });
                 });
             });
         </script>

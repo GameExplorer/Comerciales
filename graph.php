@@ -105,92 +105,86 @@ sqlsrv_free_stmt($stmt);
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Facturados per Month</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <h2>Facturados per Month</h2>
-    <div>
-        <label for="year">Select Year:</label>
-        <select id="year">
-            <?php
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Facturados per Month</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+
+    <body>
+        <h2>Facturados per Month</h2>
+        <div>
+            <label for="year">Select Year:</label>
+            <select id="year">
+                <?php
                 // Generate options for years
                 $currentYear = date("Y");
                 for ($i = $currentYear; $i >= $currentYear - 10; $i--) {
                     echo "<option value='$i'>$i</option>";
                 }
-            ?>
-        </select>
-        <button onclick="getData()">Get Data</button>
-    </div>
-    <canvas id="myChart"></canvas>
+                ?>
+            </select>
+            <button onclick="getData()">Get Data</button>
+        </div>
+        <canvas id="myChart"></canvas>
 
-    <script>
-        function getData() {
-            var year = document.getElementById('year').value;
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    var data = JSON.parse(this.responseText);
-                    updateChart(data);
-                }
-            };
-            xhr.open("GET", "get_data.php?year=" + year, true);
-            xhr.send();
-        }
-
-        function updateChart(data) {
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var labels = Object.keys(data);
-            var datasets = [];
-            <?php
-                // If user is boss
-                $userRole = "boss"; // Replace this with logic to get user role
-                if ($userRole == "boss") {
-                    echo "var users = " . json_encode(array_keys($users)) . ";\n";
-                    echo "var backgroundColors = ['#ff0000', '#00ff00', '#0000ff'];\n";
-                } else {
-                    echo "var users = ['" . $loggedInUser . "'];\n";
-                    echo "var backgroundColors = ['#ff0000'];\n"; // Change color for single user
-                }
-            ?>
-            users.forEach(function(user, index) {
-                var facturados = Object.values(data).map(function(monthData) {
-                    return monthData[user] || 0;
-                });
-                var dataset = {
-                    label: user,
-                    data: facturados,
-                    backgroundColor: backgroundColors[index],
-                    borderWidth: 1
-                };
-                datasets.push(dataset);
-            });
-            var chartData = {
-                labels: labels,
-                datasets: datasets
-            };
-            if (window.myChart instanceof Chart) {
-                window.myChart.destroy();
-            }
-            window.myChart = new Chart(ctx, {
-                type: 'bar',
-                data: chartData,
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
+        <script>
+            function getData() {
+                var year = document.getElementById('year').value;
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var data = JSON.parse(this.responseText);
+                        updateChart(data);
                     }
-                }
-            });
-        }
+                };
+                xhr.open("GET", "get_data.php?year=" + year, true);
+                xhr.send();
+            }
 
-        getData(); // Load data initially
-    </script>
-</body>
+            function updateChart(data) {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var labels = Object.keys(data);
+                var datasets = [];
+                var users = ['ROSA', 'RUBEN', 'SUSI'];
+                var backgroundColors = ['#ff0000', '#00ff00', '#0000ff'];
+                users.forEach(function (user, index) {
+                    var facturados = Object.values(data).map(function (monthData) {
+                        return monthData[user] || 0;
+                    });
+                    var dataset = {
+                        label: user,
+                        data: facturados,
+                        backgroundColor: backgroundColors[index],
+                        borderWidth: 1
+                    };
+                    datasets.push(dataset);
+                });
+                var chartData = {
+                    labels: labels,
+                    datasets: datasets
+                };
+                if (window.myChart instanceof Chart) {
+                    window.myChart.destroy();
+                }
+                window.myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            getData(); // Load data initially
+        </script>
+    </body>
+
 </html>

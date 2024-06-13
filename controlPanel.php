@@ -64,67 +64,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </head>
 
     <body>
-        <a href="Main.php" type="button" class="btn btn-success mt-4 ml-4"
-            style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-            Return
-        </a>
-        <div class="container">
-            <h2 class="mb-4">Detalles de usuarios</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Password</th>
-                        <th>Codigo Ruta</th>
-                        <th>Role</th>
-                        <th>Disabled</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $sql = "SELECT * FROM users";
-                    $result = $conn->query($sql);
+        <div class="container my-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="Main.php" class="btn btn-success">
+                    <i class="fas fa-arrow-left"></i> Devolver
+                </a>
+                <h2 class="mb-0">Detalles de los usuarios</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Contraseña</th>
+                            <th>Codigo Ruta</th>
+                            <th>Rollos</th>
+                            <th>Desactivado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $sql = "SELECT * FROM users";
+                        $result = $conn->query($sql);
 
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . $row["id"] . "</td>";
-                            echo "<td>" . $row["username"] . "</td>";
-                            echo "<td>" . $row["password"] . "</td>";
-                            echo "<td>" . $row["codigo_ruta"] . "</td>";
-                            if ($row["role"] == 1) {
-                                echo "<td>Boss</td>";
-                            } else {
-                                echo "<td>User</td>";
-                            }
-                            echo "<td>";
-
-                            echo "<input type='checkbox' disabled ";
-                            if ($row['disabled'] == 1) {
-                                echo "checked";
-                            }
-                            echo ">";
-                            echo "</td>";
-                            echo "<td>";
-                            echo "<button type='button' class='btn btn-sm btn-success editUsersBtn'
-                            data-toggle='modal' data-target='#editUserModal'
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td>" . $row["id"] . "</td>";
+                                echo "<td>" . $row["username"] . "</td>";
+                                echo "<td>" . $row["password"] . "</td>";
+                                echo "<td>" . $row["codigo_ruta"] . "</td>";
+                                echo "<td>" . ($row["role"] == 1 ? 'Boss' : 'User') . "</td>";
+                                echo "<td><input type='checkbox' disabled " . ($row['disabled'] == 1 ? 'checked' : '') . "></td>";
+                                echo "<td>";
+                                echo "<button type='button' class='btn btn-sm btn-primary editUsersBtn'
+                            data-bs-toggle='modal' data-bs-target='#editUserModal'
                             data-user-id='" . $row["id"] . "'
                             data-user-username='" . $row["username"] . "'
                             data-user-password='" . $row["password"] . "'
                             data-user-codigo_ruta='" . $row["codigo_ruta"] . "'
                             data-user-role='" . $row["role"] . "'
-                            data-user-disabled='" . $row['disabled'] . "'
-                            >Editar</button>";
-                            echo "</td>";
-                            echo "</tr>";
+                            data-user-disabled='" . $row['disabled'] . "'>
+                            <i class='fas fa-edit'></i> Editar</button>";
+                                echo "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='7'>No se encontraron usuarios</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='6'>No se encontraron usuarios</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel"
@@ -133,32 +126,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editUserForm" method="post" autocomplete="off"
                             action="<?php echo $_SERVER['PHP_SELF']; ?>">
                             <input type="hidden" id="editUserId" name="editUserId" value="">
-
-                            <div class="form-group">
-                                <label for="username">Nombre de usuario</label>
-                                <input type="text" class="form-control" id="username" name="username" value="" required>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nombre de usuario</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
                             </div>
-                            <div class="form-group">
-                                <label for="password">Contraseña</label>
-                                <input type="password" class="form-control" id="password" name="password" value=""
-                                    required>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <div class="form-group">
-                                <label for="codigoRuta">Código de Ruta</label>
-                                <input type="text" class="form-control" id="codigoRuta" name="codigoRuta" value=""
-                                    required>
+                            <div class="mb-3">
+                                <label for="codigoRuta" class="form-label">Código de Ruta</label>
+                                <input type="text" class="form-control" id="codigoRuta" name="codigoRuta" required>
                             </div>
-                            <div class="form-group">
-                                <label for="disabled">Deshabilitado</label>
-                                <input type="checkbox" class="form-control" id="disabled" name="disabled" value="1">
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="disabled" name="disabled" value="1">
+                                <label for="disabled" class="form-check-label">Deshabilitado</label>
                             </div>
                             <button type="submit" class="btn btn-primary">Guardar</button>
                         </form>
@@ -166,9 +154,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
         </div>
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
         <!-- Script for loading user data into the form when editing -->
         <script>
             $(document).ready(function () {

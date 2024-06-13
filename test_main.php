@@ -136,6 +136,7 @@ sqlsrv_free_stmt($stmt_ruta);
         <title><?php echo htmlspecialchars($pageTitle); ?></title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="style.css">
+        <title>Comerciales</title>
         <style>
             .logout-btn {
                 position: absolute;

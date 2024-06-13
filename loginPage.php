@@ -53,25 +53,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </head>
 
     <body>
-        <div class="container mt-5 pt-5" id="brrr">
-            <form method="POST" class="login-form">
-                <div class="mb-4">
-                    <label for="username" class="form-label">Usuario:</label>
-                    <input type="text" id="username" minlegnth="3" name="username" placeholder="8suario"
-                        class="form-control" required>
+        <div class="container mt-5 pt-5">
+            <div class="row justify-content-center mt-5">
+                <div class="col-lg-4 align-self-center">
+                    <div class="login-container">
+                        <h2 class="login-title">LOGIN</h2>
+                        <form method="POST" class="login-form">
+                            <div class="mb-4">
+                                <label for="username" class="form-label">Usuario:</label>
+                                <input type="text" id="username" minlegnth="3" name="username" placeholder="8suario"
+                                    class="form-control" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Contraseña:</label>
+                                <input type="password" id="password" minlength="6" name="password"
+                                    placeholder="contrasena" class="form-control" required>
+                            </div>
+                            <div>
+                                <input type="submit" class="btn btn-primary" value="Login">
+                                <span class="password-toggle" onclick="togglePassword()">Mostrar contraseña</span>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="password" class="form-label">Contraseña:</label>
-                    <input type="password" id="password" minlength="6" name="password" placeholder="contrasena"
-                        class="form-control" required>
-                </div>
-                <div>
-                    <input type="submit" class="btn btn-primary" value="Login">
-                    <span class="password-toggle" onclick="togglePassword()">Mostrar contraseña</span>
-                </div>
-            </form>
+            </div>
         </div>
-
         <script>
             function togglePassword() {
                 var passwordInput = document.getElementById("password");

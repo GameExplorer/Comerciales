@@ -43,48 +43,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
         <link rel="stylesheet" href="Login.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://getbootstrap.com/docs/5.3/assets/css/docs.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <title>Login</title>
+        <link rel="stylesheet" href="Login.css">
         <style>
-            #brrr {
-                margin-top: 100px;
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background-color: #f8f9fa;
+            }
+
+            .login-form {
+                max-width: 400px;
+                width: 100%;
+                padding: 30px;
+                background-color: #ffffff;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+            }
+
+            .password-toggle {
+                cursor: pointer;
+                margin-left: 10px;
             }
         </style>
     </head>
 
     <body>
-        <div class="container mt-5 pt-5" id="brrr">
-            <div class="row justify-content-center mt-5">
-                <div class="col-lg-4 align-self-center">
-                    <div class="login-container">
-                        <h2 class="login-title">LOGIN</h2>
-                        <form method="POST" class="login-form">
-                            <div class="mb-4">
-                                <label for="username" class="form-label">Usuario:</label>
-                                <input type="text" id="username" minlength="4" maxlength="32" name="username"
-                                    placeholder="Introduzca nombre de usuario" class="form-control" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="password" class="form-label">Contraseña:</label>
-                                <input type="password" id="password" minlength="6" maxlength="16" name="password"
-                                    placeholder="Introduzca contraseña" class="form-control" required>
-                            </div>
-                            <div class="mb-4 form-check">
-                                <input type="checkbox" class="form-check-input" id="showPassword">
-                                <label class="form-check-label" for="showPassword">Mostrar contraseña</label>
-                            </div>
-                            <div>
-                                <input type="submit" class="btn btn-primary" value="Login">
-                            </div>
-                        </form>
+        <div class="container">
+            <form method="POST" class="login-form">
+                <div class="mb-4">
+                    <label for="username" class="form-label">Usuario:</label>
+                    <input type="text" id="username" minlength="3" name="username" placeholder="Usuario"
+                        class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Contraseña:</label>
+                    <div class="input-group">
+                        <input type="password" id="password" minlength="6" name="password" placeholder="Contraseña"
+                            class="form-control" required>
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
         </div>
+
 
         <script>
             function togglePassword() {

@@ -72,6 +72,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 cursor: pointer;
                 margin-left: 10px;
             }
+
+            h1 {
+                font-weight: 600;
+                text-transform: uppercase;
+            }
         </style>
     </head>
 

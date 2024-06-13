@@ -19,3 +19,8 @@ body {
     cursor: pointer;
     margin-left: 10px;
 }
+
+h1 {
+    font-weight: 600;
+    text-transform: uppercase;
+}

@@ -127,9 +127,9 @@ $jsonData = json_encode($results_ruta);
                             beginAtZero: true
                         }
                     }
-                }
+                });
             });
-        });
-    </script>
-</body>
+        </script>
+    </body>
+
 </html>

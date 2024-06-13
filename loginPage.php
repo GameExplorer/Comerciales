@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <link rel="stylesheet" href="https://getbootstrap.com/docs/5.3/assets/css/docs.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <title>Login</title>
+        <title>Acceso</title>
         <link rel="stylesheet" href="Login.css">
         <style>
             body {
@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <body>
         <div class="">
             <form method="POST" class="login-form">
-                <h1>Login</h1>
+                <h1>Acceso</h1>
                 <div class="mb-4">
                     <label for="username" class="form-label">Usuario:</label>
                     <input type="text" id="username" minlength="3" name="username" placeholder="Usuario"

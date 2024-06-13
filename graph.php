@@ -78,7 +78,6 @@ sqlsrv_free_stmt($stmt_ruta);
 $jsonData = json_encode($results_ruta);
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,7 +86,7 @@ $jsonData = json_encode($results_ruta);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1><?php echo "Usuario: $pageTitle" ?></h1>
+    <h1><?php echo $pageTitle; ?></h1>
     <form method="get">
         <label for="annee">Seleccione el Año:</label>
         <select id="annee" name="annee" onchange="this.form.submit()">
@@ -127,9 +126,9 @@ $jsonData = json_encode($results_ruta);
                             beginAtZero: true
                         }
                     }
-                });
+                }
             });
-        </script>
-    </body>
-
+        });
+    </script>
+</body>
 </html>

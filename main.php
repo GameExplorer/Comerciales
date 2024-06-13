@@ -154,45 +154,6 @@ sqlsrv_free_stmt($stmt_ruta);
             .logout-btn:hover {
                 background-color: #d32f2f;
             }
-            .sidenav {
-  height: 100%;
-  width: 250px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #96c565;
-  overflow-x: hidden;
-  transition: 0.5s;
-  padding-top: 60px;
-}
-
-.sidenav a {
-  padding: 10px 0;
-  text-decoration: none;
-  font-size: 1.2rem;
-  color: white;
-  display: block;
-  transition: 0.3s;
-  margin-left: 20px;
-}
-
-.sidenav a:hover {
-  color: #f1f1f1;
-}
-
-.sidenav .closebtn {
-  position: absolute;
-  top: 0;
-  right: 15px;
-  font-size: 30px;
-  margin-left: 50px;
-}
-
-#main {
-  transition: margin-left 0.5s;
-  padding: 16px;
-}
 
         </style>
     </head>

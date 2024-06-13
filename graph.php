@@ -80,55 +80,58 @@ $jsonData = json_encode($results_ruta);
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?php echo $pageTitle; ?></title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <h1><?php echo $pageTitle; ?></h1>
-    <form method="get">
-        <label for="annee">Seleccione el Año:</label>
-        <select id="annee" name="annee" onchange="this.form.submit()">
-            <?php
-            for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
-                $selected = ($year == $ANNEE) ? 'selected' : '';
-                echo "<option value=\"$year\" $selected>$year</option>";
-            }
-            ?>
-        </select>
-        <noscript><input type="submit" value="Submit"></noscript>
-    </form>
-    <canvas id="facturadoChart"></canvas>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const data = <?php echo $jsonData; ?>;
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const labels = data.map(item => months[item.MES - 1]);
-            const facturadoData = data.map(item => item.FACTURADO);
 
-            const ctx = document.getElementById('facturadoChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Facturado',
-                        data: facturadoData,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+    <head>
+        <meta charset="UTF-8">
+        <title><?php echo $pageTitle; ?></title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+
+    <body>
+        <h1><?php echo $pageTitle; ?></h1>
+        <form method="get">
+            <label for="annee">Seleccione el Año:</label>
+            <select id="annee" name="annee" onchange="this.form.submit()">
+                <?php
+                for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
+                    $selected = ($year == $ANNEE) ? 'selected' : '';
+                    echo "<option value=\"$year\" $selected>$year</option>";
+                }
+                ?>
+            </select>
+            <noscript><input type="submit" value="Submit"></noscript>
+        </form>
+        <canvas id="facturadoChart"></canvas>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const data = <?php echo $jsonData; ?>;
+                const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                const labels = data.map(item => months[item.MES - 1]);
+                const facturadoData = data.map(item => item.FACTURADO);
+
+                const ctx = document.getElementById('facturadoChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Facturado',
+                            data: facturadoData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
+                });
             });
-        });
-    </script>
-</body>
+        </script>
+    </body>
+
 </html>

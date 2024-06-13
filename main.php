@@ -164,7 +164,7 @@ sqlsrv_free_stmt($stmt_ruta);
             <a href="?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=detalle_por_ruta">Detalle por Ruta</a>
             <?php
             if ($userRole == 1) {
-                echo "<a href='controlPanel.php'>Control Panel</a>";
+                echo "<a href='controlPanel.php'>Panel de Control</a>";
             }
             ?>
         </div>
@@ -201,7 +201,7 @@ sqlsrv_free_stmt($stmt_ruta);
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md3">
+                        <div class="col-md-3">
                             <label for="annee" class="form-label">Año</label>
                             <select class="form-select" id="annee" name="annee">
                                 <?php for ($y = 2020; $y <= date('Y'); $y++): ?>
@@ -264,7 +264,7 @@ sqlsrv_free_stmt($stmt_ruta);
         </div>
         </div>
         <form method="POST" action="logout.php" style="display: inline;">
-            <button type="submit" class="logout-btn">Déconnexion</button>
+            <button type="submit" class="logout-btn">Cerrar sesión</button>
         </form>
 
         <script>
@@ -280,4 +280,4 @@ sqlsrv_free_stmt($stmt_ruta);
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 
-</html> 
+</html>

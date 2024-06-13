@@ -13,21 +13,19 @@ if ($conn === false) {
     exit();
 }
 
-// Initialize filter variables
 $ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
 $userCodigoRuta = $_SESSION['codigo_ruta'];
 $userRole = $_SESSION['role'];
 
-// Vérification des paramètres de session
 if (!isset($userCodigoRuta) || !isset($userRole)) {
     echo "Error: Parámetros de sesión no definidos.";
     exit();
 }
 
-// Define page titles
+// page title
 $pageTitle = $_SESSION['username'];
 
-// Define SQL queries
+// sql query
 $sql_queries = [
     'ventas_por_ruta_yearly' => "
         SELECT 
@@ -122,42 +120,42 @@ $jsonMonthlyData = json_encode($results_monthly);
     </head>
 
     <body>
-    <a href="Main.php" class="m-4 btn btn-success">
-                    <i class="fas fa-arrow-left"></i> Devolver
-                </a><br>
+        <a href="Main.php" class="m-4 btn btn-success">
+            <i class="fas fa-arrow-left"></i> Devolver
+        </a><br>
         <h1 class="mx-4 mb-4"><?php echo "Usuario: $pageTitle" ?></h1>
         <form method="get">
             <div class="">
-       
+
                 <div class="row">
                     <div class="col-md-4 mx-4 mb-4">
-            <label for="annee">Seleccione el Año:</label>
-            <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
-                <?php
-                for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
-                    $selected = ($year == $ANNEE) ? 'selected' : '';
-                    echo "<option value=\"$year\" $selected>$year</option>";
-                }
-                ?>
-            </select>
-            </div>
-            </div>
-            <noscript><input type="submit" value="Submit"></noscript>
+                        <label for="annee">Seleccione el Año:</label>
+                        <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
+                            <?php
+                            for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
+                                $selected = ($year == $ANNEE) ? 'selected' : '';
+                                echo "<option value=\"$year\" $selected>$year</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <noscript><input type="submit" value="Submit"></noscript>
         </form>
         <canvas id="yearlyFacturadoChart"></canvas>
         <canvas id="monthlyFacturadoChart" class="mt-5"></canvas>
-            </div>
+        </div>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const yearlyData = <?php echo $jsonYearlyData; ?>;
                 const monthlyData = <?php echo $jsonMonthlyData; ?>;
                 const years = yearlyData.map(item => item.ANNEE);
                 const yearlyFacturadoData = yearlyData.map(item => item.FACTURADO);
-                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
                 const monthlyLabels = monthlyData.map(item => months[item.MES - 1]);
                 const monthlyFacturadoData = monthlyData.map(item => item.FACTURADO);
 
-                // Colors for the yearly chart
+                // Colors for the chart
                 const colors = [
                     'rgba(255, 99, 132, 0.5)',
                     'rgba(54, 162, 235, 0.5)',
@@ -209,15 +207,13 @@ $jsonMonthlyData = json_encode($results_monthly);
                             }
                         },
                         plugins: {
-            title: {
-                display: true,
-                text: 'Facturados per year'
-            }
-        }
+                            title: {
+                                display: true,
+                                text: 'Facturados per year'
+                            }
+                        }
                     }
                 });
-
-          
 
                 // Monthly Facturado Chart
                 const ctxMonthly = document.getElementById('monthlyFacturadoChart').getContext('2d');
@@ -240,11 +236,11 @@ $jsonMonthlyData = json_encode($results_monthly);
                             }
                         },
                         plugins: {
-            title: {
-                display: true,
-                text: 'Facturado in ' + <?php echo $ANNEE; ?>
-            }
-        }
+                            title: {
+                                display: true,
+                                text: 'Facturado in ' + <?php echo $ANNEE; ?>
+                            }
+                        }
                     }
                 });
             });

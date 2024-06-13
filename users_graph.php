@@ -115,13 +115,24 @@ $jsonMonthlyData = json_encode($results_monthly);
         <meta charset="UTF-8">
         <title><?php echo $pageTitle; ?></title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://getbootstrap.com/docs/5.3/assets/css/docs.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     </head>
 
     <body>
-        <h1><?php echo "Usuario: $pageTitle" ?></h1>
+    <a href="Main.php" class="m-4 btn btn-success">
+                    <i class="fas fa-arrow-left"></i> Devolver
+                </a><br>
+        <h1 class="mx-4 mb-4"><?php echo "Usuario: $pageTitle" ?></h1>
         <form method="get">
+            <div class="">
+       
+                <div class="row">
+                    <div class="col-md-4 mx-4 mb-4">
             <label for="annee">Seleccione el Año:</label>
-            <select id="annee" name="annee" onchange="this.form.submit()">
+            <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
                 <?php
                 for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
                     $selected = ($year == $ANNEE) ? 'selected' : '';
@@ -129,10 +140,13 @@ $jsonMonthlyData = json_encode($results_monthly);
                 }
                 ?>
             </select>
+            </div>
+            </div>
             <noscript><input type="submit" value="Submit"></noscript>
         </form>
         <canvas id="yearlyFacturadoChart"></canvas>
-        <canvas id="monthlyFacturadoChart"></canvas>
+        <canvas id="monthlyFacturadoChart" class="mt-5"></canvas>
+            </div>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const yearlyData = <?php echo $jsonYearlyData; ?>;
@@ -145,11 +159,18 @@ $jsonMonthlyData = json_encode($results_monthly);
 
                 // Colors for the yearly chart
                 const colors = [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)'
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(153, 102, 255, 0.5)',
+                    'rgba(38, 101, 230, 0.5)',
+                    'rgba(181, 227, 38, 0.5)',
+                    'rgba(67, 123, 120, 0.5)',
+                    'rgba(183, 38, 55, 0.5)',
+                    'rgba(200, 254, 83, 0.5)',
+                    'rgba(3, 83, 173, 0.5)',
+                    'rgba(35, 10, 239, 0.5)',
                 ];
 
                 const borderColors = [
@@ -157,7 +178,14 @@ $jsonMonthlyData = json_encode($results_monthly);
                     'rgba(54, 162, 235, 1)',
                     'rgba(255, 206, 86, 1)',
                     'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)'
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(38, 101, 230, 1)',
+                    'rgba(181, 227, 38, 1)',
+                    'rgba(67, 123, 120, 1)',
+                    'rgba(183, 38, 55, 1)',
+                    'rgba(200, 254, 83, 1)',
+                    'rgba(3, 83, 173, 1)',
+                    'rgba(35, 10, 239, 1)',
                 ];
 
                 // Yearly Facturado Chart
@@ -179,9 +207,17 @@ $jsonMonthlyData = json_encode($results_monthly);
                             y: {
                                 beginAtZero: true
                             }
-                        }
+                        },
+                        plugins: {
+            title: {
+                display: true,
+                text: 'Facturados per year'
+            }
+        }
                     }
                 });
+
+          
 
                 // Monthly Facturado Chart
                 const ctxMonthly = document.getElementById('monthlyFacturadoChart').getContext('2d');
@@ -192,8 +228,8 @@ $jsonMonthlyData = json_encode($results_monthly);
                         datasets: [{
                             label: 'Facturado in ' + <?php echo $ANNEE; ?>,
                             data: monthlyFacturadoData,
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: colors,
+                            borderColor: borderColors,
                             borderWidth: 1
                         }]
                     },
@@ -202,7 +238,13 @@ $jsonMonthlyData = json_encode($results_monthly);
                             y: {
                                 beginAtZero: true
                             }
-                        }
+                        },
+                        plugins: {
+            title: {
+                display: true,
+                text: 'Facturado in ' + <?php echo $ANNEE; ?>
+            }
+        }
                     }
                 });
             });

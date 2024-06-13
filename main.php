@@ -245,7 +245,7 @@ sqlsrv_free_stmt($stmt_ruta);
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="col-md-4 pt-2">
+                            <div class="col-md-4 pt-2 pb-4">
                                 <a href="export_csv.php?mes=<?php echo $MES; ?>&annee=<?php echo $ANNEE; ?>&query=<?php echo $queryType; ?>"
                                     class="btn btn-success">Descargar como CSV</a>
                             </div>

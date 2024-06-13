@@ -76,8 +76,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </head>
 
     <body>
-        <div class="container">
+        <div class="">
             <form method="POST" class="login-form">
+                <h1>Login</h1>
                 <div class="mb-4">
                     <label for="username" class="form-label">Usuario:</label>
                     <input type="text" id="username" minlength="3" name="username" placeholder="Usuario"

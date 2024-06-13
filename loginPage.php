@@ -29,10 +29,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: main.php");
             exit();
         } else {
-            echo "this user is disabled.";
+            echo "este usuario está deshabilitado.";
         }
     } else {
-        echo "Nom d'utilisateur et/ou mot de passe incorrect(s).";
+        echo "Nombre de usuario y/o contraseña incorrecta(s).";
     }
 }
 ?>
@@ -54,17 +54,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <body>
         <div class="container mt-5 pt-5" id="brrr">
-            <form method="POST">
-                <div>
-                    <label for="username">Usuario:</label>
-                    <input type="text" id="username" name="username" required>
+            <form method="POST" class="login-form">
+                <div class="mb-4">
+                    <label for="username" class="form-label">Usuario:</label>
+                    <input type="text" id="username" minlegnth="3" name="username" placeholder="8suario"
+                        class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Contraseña:</label>
+                    <input type="password" id="password" minlength="6" name="password" placeholder="contrasena"
+                        class="form-control" required>
                 </div>
                 <div>
-                    <label for="password">Contraseña:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <div>
-                    <input type="submit" value="Login">
+                    <input type="submit" class="btn btn-primary" value="Login">
                     <span class="password-toggle" onclick="togglePassword()">Mostrar contraseña</span>
                 </div>
             </form>

@@ -19,20 +19,36 @@ $userCodigoRuta = $_SESSION['codigo_ruta'];
 $userRole = $_SESSION['role'];
 
 // Define SQL query for fetching monthly data
-$sql = "
-    SELECT 
-        MONTH(FechaAlbaran) AS Mes, 
-        SUM(ImporteFactura) AS Facturado 
-    FROM AlbaranVentaCabecera
-    WHERE 
-        CodigoEmpresa = 1 
-        AND EjercicioAlbaran = ? 
-        AND CodigoRuta = ?
-    GROUP BY MONTH(FechaAlbaran)
-    ORDER BY MONTH(FechaAlbaran)
-";
+if ($userRole == 'boss') {
+    $sql = "
+        SELECT 
+            MONTH(FechaAlbaran) AS Mes, 
+            SUM(ImporteFactura) AS Facturado,
+            Usuario
+        FROM AlbaranVentaCabecera
+        WHERE 
+            CodigoEmpresa = 1 
+            AND EjercicioAlbaran = ? 
+        GROUP BY Usuario, MONTH(FechaAlbaran)
+        ORDER BY Usuario, MONTH(FechaAlbaran)
+    ";
+    $params = array($ANNEE);
+} else {
+    $sql = "
+        SELECT 
+            MONTH(FechaAlbaran) AS Mes, 
+            SUM(ImporteFactura) AS Facturado 
+        FROM AlbaranVentaCabecera
+        WHERE 
+            CodigoEmpresa = 1 
+            AND EjercicioAlbaran = ? 
+            AND CodigoRuta = ?
+        GROUP BY MONTH(FechaAlbaran)
+        ORDER BY MONTH(FechaAlbaran)
+    ";
+    $params = array($ANNEE, $userCodigoRuta);
+}
 
-$params = array($ANNEE, $userCodigoRuta);
 $stmt = sqlsrv_query($conn, $sql, $params);
 
 if ($stmt === false) {
@@ -116,35 +132,60 @@ $monthlyDataJson = json_encode($monthlyData);
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Facturado',
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    datasets: [
+                        <?php
+                        if ($userRole == 'boss') {
+                            $users = array_unique(array_column($monthlyData, 'Usuario'));
+                            foreach ($users as $user) {
+                                $userData = array_filter($monthlyData, function ($value) use ($user) {
+                                    return $value['Usuario'] === $user;
+                                });
+                                $userLabels = array_map(function ($data) {
+                                    $monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                                    return $monthNames[$data['Mes'] - 1];
+                                }, $userData);
+                                $userData = array_column($userData, 'Facturado');
+                                echo '{
+                                label: "' . $user . '",
+                                data: [' . implode(',', $userData) . '],
+                                backgroundColor: "rgba(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ', 0.2)",
+                                borderColor: "rgba(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ', 1)",
+                                borderWidth: 1
+                            },';
+                            }
+                        } else {
+                            echo '{
+                            label: "Facturado",
+                            data: [' . implode(',', $data) . '],
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            borderWidth: 1
+                        }';
                         }
+                        ?>
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            });
-        </script>
-
-        <script>
-            function openNav() {
-                document.getElementById("mySidenav").style.width = "250px";
             }
+        });
+    </script>
 
-            function closeNav() {
-                document.getElementById("mySidenav").style.width = "0";
-            }
-        </script>
+    <script>
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+        }
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 
 </html>

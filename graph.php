@@ -2,7 +2,7 @@
 session_start();
 include 'conexion_exit_pr.php';
 
-// Vérifier si l'utilisateur est connecté
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: loginPage.php");
     exit();
@@ -14,137 +14,183 @@ if ($conn === false) {
 }
 
 // Initialize filter variables
-$ANNEE = isset($_GET['annee']) ? intval($_GET['annee']) : date('Y');
-$userCodigoRuta = $_SESSION['codigo_ruta'];
+$year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 $userRole = $_SESSION['role'];
+$loggedInUser = $_SESSION['username'];
 
-// Define SQL query for fetching monthly data
+// Define SQL query
 $sql = "
     SELECT 
-        MONTH(FechaAlbaran) AS Mes, 
-        SUM(ImporteFactura) AS Facturado 
-    FROM AlbaranVentaCabecera
-    WHERE 
-        CodigoEmpresa = 1 
-        AND EjercicioAlbaran = ? 
-        AND CodigoRuta = ?
-    GROUP BY MONTH(FechaAlbaran)
-    ORDER BY MONTH(FechaAlbaran)
+        MONTH(FechaAlbaran) AS month,
+        CodigoRuta AS RUTA,
+        CASE
+            WHEN CodigoRuta = 91 THEN 'ROSA'
+            WHEN CodigoRuta = 92 THEN 'RUBEN'
+            WHEN CodigoRuta = 93 THEN 'SUSI'
+        END AS COMERCIAL,
+        CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
+    FROM 
+        AlbaranVentaCabecera
+    WHERE
+        CodigoEmpresa = 1
+        AND YEAR(FechaAlbaran) = ?
+        AND CodigoRuta IN (91, 92, 93)
+    GROUP BY 
+        MONTH(FechaAlbaran), CodigoRuta
+    ORDER BY 
+        MONTH(FechaAlbaran), CodigoRuta
 ";
 
-$params = array($ANNEE, $userCodigoRuta);
-$stmt = sqlsrv_query($conn, $sql, $params);
+// If the user is a boss, select data for all users
+if ($userRole == 1) {
+    $sql = "
+        SELECT 
+            MONTH(FechaAlbaran) AS month,
+            CodigoRuta AS RUTA,
+            CASE
+                WHEN CodigoRuta = 91 THEN 'ROSA'
+                WHEN CodigoRuta = 92 THEN 'RUBEN'
+                WHEN CodigoRuta = 93 THEN 'SUSI'
+            END AS COMERCIAL,
+            CAST(SUM(ImporteFactura) AS numeric(10,2)) AS FACTURADO
+        FROM 
+            AlbaranVentaCabecera
+        WHERE
+            CodigoEmpresa = 1
+            AND YEAR(FechaAlbaran) = ?
+            AND CodigoRuta IN (91, 92, 93)
+        GROUP BY 
+            MONTH(FechaAlbaran), CodigoRuta
+        ORDER BY 
+            MONTH(FechaAlbaran), CodigoRuta
+    ";
+}
 
-if ($stmt === false) {
+$stmt = sqlsrv_prepare($conn, $sql, array($year));
+if (!$stmt) {
+    echo "Error en la consulta SQL:";
     die(print_r(sqlsrv_errors(), true));
 }
 
-$monthlyData = [];
+// Execute the query
+sqlsrv_execute($stmt);
+
+// Fetch results
+$chartData = array();
 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-    $monthlyData[] = $row;
+    $month = $row['month'];
+    $ruta = $row['RUTA'];
+    $user = '';
+    switch ($ruta) {
+        case 91:
+            $user = 'ROSA';
+            break;
+        case 92:
+            $user = 'RUBEN';
+            break;
+        case 93:
+            $user = 'SUSI';
+            break;
+        default:
+            $user = '';
+            break;
+    }
+    if (!isset($chartData[$month])) {
+        $chartData[$month] = array();
+    }
+    $chartData[$month][$user] = $row['FACTURADO'];
 }
-
 sqlsrv_free_stmt($stmt);
-
-// Convert PHP array to JSON
-$monthlyDataJson = json_encode($monthlyData);
-
 ?>
-<!DOCTYPE html>
-<html lang="es">
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ventas Mensuales</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        .logout-btn:hover {
-            background-color: #d32f2f;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <!-- Your sidebar links -->
-    </div>
-
-    <div id="main">
-        <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Ventas Mensuales</span>
-        <div class="container mt-5">
-            <!-- Your form and table -->
-        </div>
-    </div>
-
-    <form method="POST" action="logout.php" style="display: inline;">
-        <button type="submit" class="logout-btn">Déconnexion</button>
-    </form>
-
-    <div class="container mt-5">
-        <canvas id="myChart"></canvas>
-    </div>
-
+    <title>Facturados per Month</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Facturados per Month</h2>
+    <div>
+        <label for="year">Select Year:</label>
+        <select id="year">
+            <?php
+                // Generate options for years
+                $currentYear = date("Y");
+                for ($i = $currentYear; $i >= $currentYear - 10; $i--) {
+                    echo "<option value='$i'>$i</option>";
+                }
+            ?>
+        </select>
+        <button onclick="getData()">Get Data</button>
+    </div>
+    <canvas id="myChart"></canvas>
+
     <script>
-        // Get the data from PHP
-        const monthlyData = <?php echo $monthlyDataJson; ?>;
+        function getData() {
+            var year = document.getElementById('year').value;
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var data = JSON.parse(this.responseText);
+                    updateChart(data);
+                }
+            };
+            xhr.open("GET", "get_data.php?year=" + year, true);
+            xhr.send();
+        }
 
-        // Prepare data for Chart.js
-        const labels = monthlyData.map(data => {
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            return monthNames[data.Mes - 1];
-        });
-
-        const data = monthlyData.map(data => data.Facturado);
-
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Facturado',
-                    data: data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+        function updateChart(data) {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var labels = Object.keys(data);
+            var datasets = [];
+            <?php
+                // If user is boss
+                $userRole = "boss"; // Replace this with logic to get user role
+                if ($userRole == "boss") {
+                    echo "var users = " . json_encode(array_keys($users)) . ";\n";
+                    echo "var backgroundColors = ['#ff0000', '#00ff00', '#0000ff'];\n";
+                } else {
+                    echo "var users = ['" . $loggedInUser . "'];\n";
+                    echo "var backgroundColors = ['#ff0000'];\n"; // Change color for single user
+                }
+            ?>
+            users.forEach(function(user, index) {
+                var facturados = Object.values(data).map(function(monthData) {
+                    return monthData[user] || 0;
+                });
+                var dataset = {
+                    label: user,
+                    data: facturados,
+                    backgroundColor: backgroundColors[index],
                     borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+                };
+                datasets.push(dataset);
+            });
+            var chartData = {
+                labels: labels,
+                datasets: datasets
+            };
+            if (window.myChart instanceof Chart) {
+                window.myChart.destroy();
+            }
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
                     }
                 }
-            }
-        });
-    </script>
-
-    <script>
-        function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
+            });
         }
 
-        function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-        }
+        getData(); // Load data initially
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

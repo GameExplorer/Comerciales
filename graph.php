@@ -125,48 +125,55 @@ while ($row = sqlsrv_fetch_array($stmt_ruta, SQLSRV_FETCH_ASSOC)) {
 }
 
 sqlsrv_free_stmt($stmt_ruta);
-?>
 
-<!DO    CTYPE html>
-    <html>
-<hea    d>
-    <title><?php echo $pageTitle; ?></title>
+// Convert results to JSON for JavaScript
+$jsonData = json_encode($results_ruta);
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title><?php echo $pageTitle; ?></title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</he    ad>
+    </head>
+
     <body>
-    <h1>    <?php echo $pageTitle; ?></h1>
-        <canvas id="ventasChart" width="400" height="200"></canvas>
-    <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                var ctx = document.getElementById('ventasChart').getContext('2d');
-                var chartData = {
-                    labels: [<?php
-                    // Get unique route names for labels
-                    $routes = array_unique(array_column($results_ruta, 'COMERCIAL'));
-                    echo '"' . implode('","', $routes) . '"';
-                    ?>],
-                    datasets: [{
-                    label: 'Ventas Facturado',
-                    data: [<?php
-                    // Aggregate data by route
-                    $facturadoPorRuta = array_reduce($results_ruta, function ($carry, $item) {
-                        if (!isset($carry[$item['COMERCIAL']])) {
-                            $carry[$item['COMERCIAL']] = 0;
-                        }
-                        $carry[$item['COMERCIAL']] += $item['FACTURADO'];
-                        return $carry;
-                    }, []);
-                    echo implode(',', $facturadoPorRuta);
-                    ?>],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            };
-            var ventasChart = new Chart(ctx, {
-                type: 'bar',
-                    data: chartData,
-                options: {
+        <h1><?php echo $pageTitle; ?></h1>
+        <form method="get">
+            <label for="annee">Seleccione el Año:</label>
+            <select id="annee" name="annee" onchange="this.form.submit()">
+                <?php
+                for ($year = date('Y'); $year >= 2000; $year--) {
+                    $selected = ($year == $ANNEE) ? 'selected' : '';
+                    echo "<option value=\"$year\" $selected>$year</option>";
+                }
+                ?>
+            </select>
+            <noscript><input type="submit" value="Submit"></noscript>
+        </form>
+        <canvas id="facturadoChart"></canvas>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const data = <?php echo $jsonData; ?>;
+                const labels = data.map(item => item.COMERCIAL || item.RUTA);
+                const facturadoData = data.map(item => item.FACTURADO);
+
+                const ctx = document.getElementById('facturadoChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Facturado',
+                            data: facturadoData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
                         scales: {
                             y: {
                                 beginAtZero: true
@@ -174,7 +181,8 @@ sqlsrv_free_stmt($stmt_ruta);
                         }
                     }
                 });
-        });
-            </script>
-</body>
-        </html>
+            });
+        </script>
+    </body>
+
+</html>

@@ -31,7 +31,7 @@ $pageTitles = [
     'detalle_por_ruta' => 'Detalle por Ruta'
 ];
 $queryType = 'ventas_por_ruta'; // Assuming we want 'ventas_por_ruta' for this example
-$pageTitle = $pageTitles[$queryType] ?? 'Ventas';
+$pageTitle = $_SESSION['username'];
 
 // Define SQL queries
 $sql_queries = [
@@ -86,7 +86,7 @@ $jsonData = json_encode($results_ruta);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1><?php echo $pageTitle; ?></h1>
+    <h1><?php echo "Usuario: $pageTitle" ?></h1>
     <form method="get">
         <label for="annee">Seleccione el Año:</label>
         <select id="annee" name="annee" onchange="this.form.submit()">

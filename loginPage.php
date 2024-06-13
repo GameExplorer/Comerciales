@@ -45,15 +45,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login</title>
         <link rel="stylesheet" href="Login.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
         <style>
-            #brrr {
-                margin-top: 100px;
-            }
+            body {
+  background-color: #f5f5f5;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.login-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 30px;
+  margin-top: 12.5em;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  margin-bottom: 15px;
+}
+
+.login-btn {
+  background-color: #96c565;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background-color: #86af4b;
+}
+
+.error-message {
+  color: red;
+  font-size: 1rem;
+  margin-top: 10px;
+  font-weight: 600;
+}
+.password-toggle {
+  margin-left: -30px;
+  cursor: pointer;
+}
+
+form {
+  text-align: center;
+}
+
         </style>
     </head>
 
     <body>
-        <div class="container mt-5 pt-5" id="brrr">
+        <div class="container mt-5 pt-5">
             <div class="row justify-content-center mt-5">
                 <div class="col-lg-4 align-self-center">
                     <div class="login-container">
@@ -74,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <label class="form-check-label" for="showPassword">Mostrar contraseña</label>
                             </div>
                             <div>
-                                <input type="submit" class="btn btn-primary" value="Login">
+                                <input type="submit" class="login-btn btn btn-primary" value="Login">
                             </div>
                         </form>
                     </div>

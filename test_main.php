@@ -95,6 +95,7 @@ $sql_queries = [
             AVC.CodigoEmpresa = 1
             AND AVC.EjercicioAlbaran = ?
             AND MONTH(AVC.FechaAlbaran) = ?
+            AND ((1 = ?) OR CodigoRuta = ?)
             AND AVC.CodigoRuta IN (91,92,93)
         GROUP BY AVC.CodigoRuta, AVC.CodigoComisionista, AVC.FechaAlbaran, AVC.CodigoCliente, AVC.RazonSocial, AVC.NumeroFactura, COMI.Comisionista
         ORDER BY RUTA, AVC.FechaAlbaran, AVC.CodigoCliente

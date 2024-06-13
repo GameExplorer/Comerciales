@@ -78,6 +78,7 @@ sqlsrv_free_stmt($stmt_ruta);
 $jsonData = json_encode($results_ruta);
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

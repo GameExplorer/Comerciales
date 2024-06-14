@@ -108,27 +108,27 @@ $jsonDataMes = json_encode($results_mois);
             <i class="fas fa-arrow-left"></i> Devolver
         </a><br>
         <h1 class="mx-4 mb-4">Graphs of all the users</h1>
-
-        <form method="get">
-            <div class="row">
-                <div class="col-md-4 mx-4 mb-4">
-                    <label for="annee">Seleccione el Año:</label>
-                    <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
-                        <?php
-                        for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
-                            $selected = ($year == $ANNEE) ? 'selected' : '';
-                            echo "<option value=\"$year\" $selected>$year</option>";
-                        }
-                        ?>
-                    </select>
+        <div class="container">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-4 mx-4 mb-4">
+                        <label for="annee">Seleccione el Año:</label>
+                        <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
+                            <?php
+                            for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
+                                $selected = ($year == $ANNEE) ? 'selected' : '';
+                                echo "<option value=\"$year\" $selected>$year</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <noscript><input type="submit" value="Submit"></noscript>
-        </form>
+                <noscript><input type="submit" value="Submit"></noscript>
+            </form>
 
-        <canvas id="facturadoChartAnnee"></canvas>
-        <canvas id="facturadoChartMes"></canvas>
-
+            <canvas id="facturadoChartAnnee"></canvas>
+            <canvas id="facturadoChartMes"></canvas>
+        </div>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 // Données pour le diagramme par année

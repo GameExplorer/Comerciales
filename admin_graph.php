@@ -107,8 +107,9 @@ $jsonDataMes = json_encode($results_mois);
         <a href="Main.php" class="m-4 btn btn-success">
             <i class="fas fa-arrow-left"></i> Devolver
         </a><br>
-        <h1 class="mx-4 mb-4">Graphs of all the users</h1>
         <div class="container">
+        <h1 class="mx-4 mb-4">Graphs of all the users</h1>
+
             <form method="get">
                 <div class="row">
                     <div class="col-md-4 mx-4 mb-4">

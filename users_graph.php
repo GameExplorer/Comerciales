@@ -121,8 +121,9 @@ $jsonMonthlyData = json_encode($results_monthly);
         <a href="Main.php" class="m-4 btn btn-success">
             <i class="fas fa-arrow-left"></i> Devolver
         </a><br>
-        <h1 class="mx-4 mb-4"><?php echo "Usuario: $pageTitle" ?></h1>
         <div class="container">
+        <h1 class="mx-4 mb-4"><?php echo "Usuario: $pageTitle" ?></h1>
+
             <form method="get">
                 <div class="">
 

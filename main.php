@@ -170,8 +170,12 @@ sqlsrv_free_stmt($stmt_ruta);
                 echo "<a href='controlPanel.php'>Panel de Control</a>";
             }
 
-            if($userRole == 0) {
+            if ($userRole == 0) {
                 echo "<a href='users_graph.php'>Mis Gráficos</a>";
+            }
+
+            if ($userRole == 1) {
+                echo "<a href='admin_graph.php'>Mis Gráficos</a>";
             }
             ?>
         </div>

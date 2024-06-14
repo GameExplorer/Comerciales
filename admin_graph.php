@@ -104,11 +104,16 @@ $jsonDataMes = json_encode($results_mois);
     </head>
 
     <body>
-        <h1><?php echo $pageTitle; ?></h1>
+    <a href="Main.php" class="m-4 btn btn-success">
+            <i class="fas fa-arrow-left"></i> Devolver
+        </a><br>
+        <h1 class="mx-4 mb-4">Graphs of all the users></h1>
 
         <form method="get">
+            <div class="row">
+            <div class="col-md-4 mx-4 mb-4">
             <label for="annee">Seleccione el Año:</label>
-            <select id="annee" name="annee" onchange="this.form.submit()">
+            <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
                 <?php
                 for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
                     $selected = ($year == $ANNEE) ? 'selected' : '';
@@ -116,6 +121,8 @@ $jsonDataMes = json_encode($results_mois);
                 }
                 ?>
             </select>
+            </div>
+            </div>
             <noscript><input type="submit" value="Submit"></noscript>
         </form>
 

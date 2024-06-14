@@ -33,7 +33,7 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `codigo_ruta` int(11) DEFAULT NULL,
   `disabled` tinyint(1) DEFAULT NULL,
-  `role` enum('user','boss') NOT NULL
+  `role` BOOLEAN
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

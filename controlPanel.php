@@ -1,5 +1,5 @@
 <?php
-include 'conexion_db.php'; // Make sure to include your database connection file
+include 'conexion_db.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['editUserId']) && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['codigoRuta'])) {

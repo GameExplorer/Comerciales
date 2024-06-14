@@ -12,7 +12,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Requête SQL pour vérifier les identifiants de connexion
     $sql = "SELECT * FROM users WHERE username = ? AND password = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ss', $username, $password);
@@ -29,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: main.php");
             exit();
         } else {
-            echo "este usuario está deshabilitado.";
+            echo '<span class="errorMessage">este usuario está deshabilitado.</span>';
         }
     } else {
         echo "Nombre de usuario y/o contraseña incorrecta(s).";
@@ -77,6 +76,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 font-weight: 600;
                 text-transform: uppercase;
             }
+
+            .errorMessage {
+                color: red;
+                font-weight: bold;
+            }
         </style>
     </head>
 
@@ -100,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary">Acceso</button>
                 </div>
             </form>
         </div>

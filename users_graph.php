@@ -2,7 +2,6 @@
 session_start();
 include 'conexion_exit_pr.php';
 
-// Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
     header("Location: loginPage.php");
     exit();
@@ -22,7 +21,6 @@ if (!isset($userCodigoRuta) || !isset($userRole)) {
     exit();
 }
 
-// page title
 $pageTitle = $_SESSION['username'];
 
 // sql query
@@ -155,7 +153,6 @@ $jsonMonthlyData = json_encode($results_monthly);
                 const monthlyLabels = monthlyData.map(item => months[item.MES - 1]);
                 const monthlyFacturadoData = monthlyData.map(item => item.FACTURADO);
 
-                // Colors for the chart
                 const colors = [
                     'rgba(54, 162, 235, 0.5)',
                 ];

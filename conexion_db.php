@@ -1,5 +1,4 @@
 <?php
-//Establecer conexión a la base de datos
 date_default_timezone_set('Atlantic/Canary');
 
 $servername = "localhost";

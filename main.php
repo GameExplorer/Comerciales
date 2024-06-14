@@ -2,7 +2,6 @@
 session_start();
 include 'conexion_exit_pr.php';
 
-// Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
     header("Location: loginPage.php");
     exit();
@@ -20,7 +19,6 @@ $queryType = isset($_GET['query']) ? $_GET['query'] : 'ventas_por_cliente';
 $userCodigoRuta = $_SESSION['codigo_ruta'];
 $userRole = $_SESSION['role'];
 
-// Vérification des paramètres de session
 if (!isset($userCodigoRuta) || !isset($userRole)) {
     echo "Error: Parámetros de sesión no definidos.";
     exit();
@@ -273,8 +271,6 @@ sqlsrv_free_stmt($stmt_ruta);
                         </tbody>
                     </table>
                 </div>
-                <!-- End of Table Display -->
-
             </div>
         </div>
         </div>

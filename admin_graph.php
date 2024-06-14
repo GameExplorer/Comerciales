@@ -104,32 +104,29 @@ $jsonDataMes = json_encode($results_mois);
     </head>
 
     <body>
-    <a href="Main.php" class="m-4 btn btn-success">
+        <a href="Main.php" class="m-4 btn btn-success">
             <i class="fas fa-arrow-left"></i> Devolver
         </a><br>
-        <h1 class="mx-4 mb-4">Graphs of all the users></h1>
+        <h1 class="mx-4 mb-4">Graphs of all the users</h1>
 
         <form method="get">
             <div class="row">
-            <div class="col-md-4 mx-4 mb-4">
-            <label for="annee">Seleccione el Año:</label>
-            <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
-                <?php
-                for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
-                    $selected = ($year == $ANNEE) ? 'selected' : '';
-                    echo "<option value=\"$year\" $selected>$year</option>";
-                }
-                ?>
-            </select>
-            </div>
+                <div class="col-md-4 mx-4 mb-4">
+                    <label for="annee">Seleccione el Año:</label>
+                    <select id="annee" name="annee" class="form-select" onchange="this.form.submit()">
+                        <?php
+                        for ($year = date('Y'); $year >= date('Y') - 4; $year--) {
+                            $selected = ($year == $ANNEE) ? 'selected' : '';
+                            echo "<option value=\"$year\" $selected>$year</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
             </div>
             <noscript><input type="submit" value="Submit"></noscript>
         </form>
 
-        <!-- Diagramme par Année -->
         <canvas id="facturadoChartAnnee"></canvas>
-
-        <!-- Diagramme par Mois -->
         <canvas id="facturadoChartMes"></canvas>
 
         <script>
@@ -179,9 +176,8 @@ $jsonDataMes = json_encode($results_mois);
                     }
                 });
 
-                // Données pour le diagramme par mois
                 const dataMes = <?php echo $jsonDataMes; ?>;
-                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
                 const labelsMes = dataMes.map(item => months[item.MES - 1]);
                 const rosaDataMes = dataMes.map(item => item.ROSA);
                 const rubenDataMes = dataMes.map(item => item.RUBEN);
